@@ -1,6 +1,6 @@
 # Theme helpers — image output examples
 
-Плагин подключает `includes/image-helpers.php` с функциями для вывода `<picture>` + WebP. Логика совместима с подходом из тем BSB / bik-bsb (`image.helper.php`), но с нейтральными именами `webp_ac_*`.
+Плагин подключает `includes/image-helpers.php` с функциями для вывода `<picture>` + WebP (`webp_ac_*`).
 
 ## Быстрый старт
 
@@ -107,20 +107,6 @@ add_filter( 'webp_ac_filter_the_content', '__return_true' );
 | `is_lcp` | `false` | `fetchpriority="high"` + eager |
 | `decorative` | `false` | Пустой alt + `aria-hidden` |
 | `context_label` | `''` | Fallback для alt у иконок |
-
-## Миграция с темы
-
-Если в теме уже есть `NITG_img_creator` / `NITG_acf_image_html`, можно постепенно заменить:
-
-```php
-// Было (тема)
-echo NITG_acf_image_html( $image, [ 'class' => 'card__img', 'is_lcp' => true ] );
-
-// Стало (плагин)
-echo webp_ac_attachment_image_html( $image, [ 'class' => 'card__img', 'is_lcp' => true ] );
-```
-
-Тема может оставить свои обёртки и вызывать `webp_ac_get_image_html()` внутри — плагин не требует ACF.
 
 ## Что генерируется
 
