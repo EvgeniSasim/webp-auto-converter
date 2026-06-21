@@ -45,9 +45,7 @@ Disable under **Settings → WebP Converter** if your theme uses custom image he
 
 = Does this delete my original JPEG or PNG files? =
 
-No. The plugin creates additional `.webp` files alongside the originals.
-
-Original JPEG/PNG files are kept. With plug & play enabled, browsers that support WebP receive `<picture>` markup automatically.
+No. The plugin creates additional `.webp` files alongside the originals. With plug & play enabled, browsers that support WebP receive `<picture>` markup automatically.
 
 = Do I need to edit my theme? =
 
@@ -55,7 +53,7 @@ No. Plug & play is on by default. Disable it in settings if your theme already o
 
 = Will every visitor receive WebP images? =
 
-The plugin swaps URLs in WordPress `srcset` output when a WebP sibling exists. Browsers that request those URLs will load WebP. For broader coverage, combine with theme `<picture>` elements or server rules if needed.
+With plug & play enabled, the plugin outputs `<picture>` with a WebP `<source>` when sibling files exist. Browsers that support WebP load the smaller format; others fall back to JPEG/PNG via the `<img>` tag.
 
 = What quality should I use? =
 
