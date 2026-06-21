@@ -1,0 +1,33 @@
+name: Bug report
+description: Report a problem with WebP Auto Converter
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: wp-version
+    attributes:
+      label: WordPress version
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+  - type: dropdown
+    id: backend
+    attributes:
+      label: Image backend
+      options:
+        - GD
+        - Imagick
+        - Unknown

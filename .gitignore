@@ -1,0 +1,8 @@
+build/
+.DS_Store
+.idea/
+.vscode/
+*.log
+.venv-assets/
+scripts/__pycache__/
+*.pyc

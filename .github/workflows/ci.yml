@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PHP syntax check
+        run: php -l webp-auto-converter/webp-auto-converter.php && php -l webp-auto-converter/uninstall.php
+
+      - name: Verify readme version match
+        run: |
+          PHP_VERSION=$(grep 'Version:' webp-auto-converter/webp-auto-converter.php | awk '{print $NF}')
+          README_TAG=$(grep 'Stable tag:' webp-auto-converter/readme.txt | awk '{print $NF}')
+          test "${PHP_VERSION}" = "${README_TAG}"
+
+      - name: Build release zip
+        run: bash scripts/build-release.sh
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: webp-auto-converter-zip
+          path: build/webp-auto-converter.zip
