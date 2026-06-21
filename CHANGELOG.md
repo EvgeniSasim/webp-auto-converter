@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.1] - 2026-06-21
+
+### Added
+- `webp_ac_get_the_post_thumbnail_html()` / `webp_ac_the_post_thumbnail()`
+- `webp_ac_get_image_from_post_meta()` / `webp_ac_get_image_from_option()`
+- `webp_ac_wp_attachment_image()` — drop-in for `wp_get_attachment_image()`
+- `webp_ac_get_the_content_images_html()` for post content without ACF
+
 ## [1.2.0] - 2026-06-21
 
 ### Added

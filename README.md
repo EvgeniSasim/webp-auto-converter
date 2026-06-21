@@ -61,16 +61,16 @@ python3 scripts/generate-wporg-assets.py
 ### Theme image helpers
 
 ```php
-// ACF / attachment field
-echo webp_ac_attachment_image_html( get_field( 'image' ), [
-	'class' => 'section__img',
-	'size'  => 'large',
-] );
+// Featured image (no ACF)
+echo webp_ac_get_the_post_thumbnail_html( null, [ 'class' => 'entry__thumb' ] );
 
-// Hero LCP image
-echo webp_ac_hero_image_html( get_field( 'hero' ), true );
+// Post meta with attachment ID
+echo webp_ac_get_image_from_post_meta( get_the_ID(), 'hero_image_id', [ 'is_lcp' => true ] );
 
-// Enable optional the_content filter
+// Drop-in for wp_get_attachment_image()
+echo webp_ac_wp_attachment_image( 123, 'large', [ 'class' => 'card__img' ] );
+
+// Optional the_content filter
 add_filter( 'webp_ac_filter_the_content', '__return_true' );
 ```
 

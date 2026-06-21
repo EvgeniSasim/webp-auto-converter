@@ -3,7 +3,7 @@
  * Plugin Name:       WebP Auto Converter
  * Plugin URI:        https://github.com/EvgeniSasim/webp-auto-converter
  * Description:       Converts uploaded JPEG and PNG images to WebP (original and thumbnails), serves WebP in responsive srcset, and cleans up on delete.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Evgenii Sasim

@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Normalize attachment input: ID, URL, or ACF-style array.
+ * Normalize attachment input: ID, URL, or image array (`ID` / `id` keys).
  *
  * @param mixed $image Attachment ID, URL, or image array.
  * @return array{ID:int,url?:string,alt?:string,decorative?:bool,context_label?:string}|null
@@ -383,7 +383,9 @@ function webp_ac_hero_image_html( $img, bool $is_lcp = true, string $class = 'he
 }
 
 /**
- * Attachment / ACF image field with sensible defaults.
+ * Attachment ID, URL, or image array with sensible defaults.
+ *
+ * Accepts attachment ID, media URL, or array with `ID` / `id` (e.g. from custom fields).
  *
  * @param mixed              $image   Attachment ID, URL, or image array.
  * @param array<string,mixed> $options Same keys as webp_ac_get_image_html() args.
@@ -407,6 +409,140 @@ function webp_ac_attachment_image_html( $image, array $options = array() ): stri
 	);
 
 	return (string) wp_get_attachment_image( (int) $image['ID'], $size, false, $attrs );
+}
+
+/**
+ * Featured image markup for a post (no ACF required).
+ *
+ * @param int|WP_Post|null      $post Post object, ID, or null for current post.
+ * @param array<string,mixed>   $args Same keys as webp_ac_get_image_html() args.
+ */
+function webp_ac_get_the_post_thumbnail_html( $post = null, array $args = array() ): string {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return '';
+	}
+
+	$thumbnail_id = (int) get_post_thumbnail_id( $post );
+	if ( $thumbnail_id <= 0 ) {
+		return '';
+	}
+
+	$defaults = array(
+		'size' => 'post-thumbnail',
+	);
+	$args = array_merge( $defaults, $args );
+
+	return webp_ac_get_image_html( $thumbnail_id, $args );
+}
+
+/**
+ * Echo featured image markup.
+ *
+ * @param string|array<string,mixed> $size Image size name or webp_ac_get_image_html() args when array.
+ * @param array<string,mixed>        $args Extra args when $size is a string.
+ */
+function webp_ac_the_post_thumbnail( $size = 'post-thumbnail', array $args = array() ): void {
+	if ( is_array( $size ) ) {
+		$args = $size;
+		$size = $args['size'] ?? 'post-thumbnail';
+		unset( $args['size'] );
+	}
+
+	$args['size'] = (string) $size;
+
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in builder.
+	echo webp_ac_get_the_post_thumbnail_html( null, $args );
+}
+
+/**
+ * Image from post meta (attachment ID or media URL stored in meta).
+ *
+ * @param int|WP_Post|null    $post     Post object, ID, or null for current post.
+ * @param string              $meta_key Post meta key.
+ * @param array<string,mixed> $args     Same keys as webp_ac_get_image_html() args.
+ */
+function webp_ac_get_image_from_post_meta( $post, string $meta_key, array $args = array() ): string {
+	$post = get_post( $post );
+	if ( ! $post || '' === $meta_key ) {
+		return '';
+	}
+
+	$value = get_post_meta( $post->ID, $meta_key, true );
+	$image = webp_ac_normalize_image( $value );
+	if ( ! $image ) {
+		return '';
+	}
+
+	return webp_ac_get_image_html( $image, $args );
+}
+
+/**
+ * Image from a site option (attachment ID or media URL).
+ *
+ * @param string              $option_name Option name.
+ * @param array<string,mixed> $args        Same keys as webp_ac_get_image_html() args.
+ */
+function webp_ac_get_image_from_option( string $option_name, array $args = array() ): string {
+	if ( '' === $option_name ) {
+		return '';
+	}
+
+	$value = get_option( $option_name, null );
+	$image = webp_ac_normalize_image( $value );
+	if ( ! $image ) {
+		return '';
+	}
+
+	return webp_ac_get_image_html( $image, $args );
+}
+
+/**
+ * Drop-in for wp_get_attachment_image() with WebP <picture> when available.
+ *
+ * @param int|string          $attachment_id Attachment ID.
+ * @param string|int[]        $size          Registered size name or [width, height].
+ * @param array<string,mixed> $args          Same keys as webp_ac_get_image_html() args.
+ */
+function webp_ac_wp_attachment_image( $attachment_id, $size = 'thumbnail', array $args = array() ): string {
+	$attachment_id = (int) $attachment_id;
+	if ( $attachment_id <= 0 ) {
+		return '';
+	}
+
+	if ( is_array( $size ) ) {
+		$args['size'] = $size;
+	} else {
+		$args['size'] = (string) $size;
+	}
+
+	$html = webp_ac_get_image_html( $attachment_id, $args );
+	if ( '' !== $html ) {
+		return $html;
+	}
+
+	$loading = ! empty( $args['is_lcp'] ) ? 'eager' : ( $args['loading'] ?? 'lazy' );
+	$attrs   = array(
+		'loading' => $loading,
+		'class'   => $args['class'] ?? '',
+	);
+
+	return (string) wp_get_attachment_image( $attachment_id, $size, false, $attrs );
+}
+
+/**
+ * Post content with wp-image tags upgraded to <picture> markup.
+ *
+ * @param int|WP_Post|null    $post Post object, ID, or null for current post.
+ * @param array<string,mixed> $args Replacement options.
+ */
+function webp_ac_get_the_content_images_html( $post = null, array $args = array() ): string {
+	$post = get_post( $post );
+	if ( ! $post ) {
+		return '';
+	}
+
+	return webp_ac_replace_content_images( $post->post_content, $args );
 }
 
 /**
