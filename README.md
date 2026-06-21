@@ -61,8 +61,6 @@ python3 scripts/generate-wporg-assets.py
 
 **Evgenii Sasim** — [Instagram](https://www.instagram.com/evgenii.sasim/)
 
-Originally developed for the [NITG](https://github.com/EvgeniSasim) WordPress theme stack.
-
 ## License
 
 GPL-2.0-or-later. See [LICENSE](LICENSE).
