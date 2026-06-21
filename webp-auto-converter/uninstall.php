@@ -8,3 +8,4 @@
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 delete_option( 'webp_auto_converter_quality' );
+delete_option( 'webp_auto_converter_auto_output' );

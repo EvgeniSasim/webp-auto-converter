@@ -17,6 +17,7 @@ jobs:
           php -l webp-auto-converter/webp-auto-converter.php
           php -l webp-auto-converter/uninstall.php
           php -l webp-auto-converter/includes/image-helpers.php
+          php -l webp-auto-converter/includes/auto-output.php
 
       - name: Verify readme version match
         run: |

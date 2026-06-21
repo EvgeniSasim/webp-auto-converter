@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [1.3.0] - 2026-06-21
+
+### Added
+- Plug & play front-end output (enabled by default): `wp_get_attachment_image`, thumbnails, content, widgets
+- Admin setting **Plug & play front-end output**
+- Filters: `webp_ac_auto_output_enabled`, `webp_ac_should_auto_output`, `webp_ac_default_sizes_attr`
+
 ## [1.2.1] - 2026-06-21
 
 ### Added

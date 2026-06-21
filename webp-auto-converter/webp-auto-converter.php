@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       WebP Auto Converter
  * Plugin URI:        https://github.com/EvgeniSasim/webp-auto-converter
- * Description:       Converts uploaded JPEG and PNG images to WebP (original and thumbnails), serves WebP in responsive srcset, and cleans up on delete.
- * Version:           1.2.1
+ * Description:       Converts uploaded JPEG and PNG images to WebP and automatically serves them on the front end (plug & play).
+ * Version:           1.3.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Evgenii Sasim
@@ -17,8 +17,19 @@
 
 defined( 'ABSPATH' ) || exit;
 
-const WEBP_AUTO_CONVERTER_OPTION = 'webp_auto_converter_quality';
-const WEBP_AUTO_CONVERTER_BATCH  = 25;
+const WEBP_AUTO_CONVERTER_OPTION       = 'webp_auto_converter_quality';
+const WEBP_AUTO_CONVERTER_AUTO_OUTPUT  = 'webp_auto_converter_auto_output';
+const WEBP_AUTO_CONVERTER_BATCH        = 25;
+
+register_activation_hook( __FILE__, 'webp_auto_converter_activate' );
+
+/**
+ * Set default options on activation.
+ */
+function webp_auto_converter_activate(): void {
+	add_option( WEBP_AUTO_CONVERTER_OPTION, 82 );
+	add_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, 1 );
+}
 
 // --- Settings ---
 add_action( 'admin_menu', 'webp_auto_converter_menu' );
@@ -53,11 +64,31 @@ function webp_auto_converter_settings(): void {
 		)
 	);
 
+	register_setting(
+		'webp_auto_converter_options',
+		WEBP_AUTO_CONVERTER_AUTO_OUTPUT,
+		array(
+			'type'              => 'boolean',
+			'default'           => true,
+			'sanitize_callback' => static function ( $value ) {
+				return ! empty( $value );
+			},
+		)
+	);
+
 	add_settings_section(
 		'webp_auto_converter_main',
 		__( 'Settings', 'webp-auto-converter' ),
 		null,
 		'webp-auto-converter'
+	);
+
+	add_settings_field(
+		WEBP_AUTO_CONVERTER_AUTO_OUTPUT,
+		__( 'Plug & play front-end output', 'webp-auto-converter' ),
+		'webp_auto_converter_auto_output_field',
+		'webp-auto-converter',
+		'webp_auto_converter_main'
 	);
 
 	add_settings_field(
@@ -67,6 +98,19 @@ function webp_auto_converter_settings(): void {
 		'webp-auto-converter',
 		'webp_auto_converter_main'
 	);
+}
+
+/**
+ * Render plug-and-play setting field.
+ */
+function webp_auto_converter_auto_output_field(): void {
+	$value = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
+	echo '<input type="hidden" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="0">';
+	echo '<label>';
+	echo '<input type="checkbox" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="1" ' . checked( $value, true, false ) . '>';
+	echo ' ' . esc_html__( 'Automatically output WebP in themes (no code required)', 'webp-auto-converter' );
+	echo '</label>';
+	echo '<p class="description">' . esc_html__( 'Enhances featured images, attachment images, and post/widget content with responsive <picture> markup when WebP files exist.', 'webp-auto-converter' ) . '</p>';
 }
 
 /**
@@ -431,3 +475,4 @@ function webp_auto_converter_unlink_webp( string $source_path ): void {
 }
 
 require_once __DIR__ . '/includes/image-helpers.php';
+require_once __DIR__ . '/includes/auto-output.php';

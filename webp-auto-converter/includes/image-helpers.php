@@ -619,24 +619,3 @@ function webp_ac_render_rich_content( $content, array $image_options = array() )
 
 	return webp_ac_replace_content_images( $html, $image_options );
 }
-
-/**
- * Optional the_content filter. Disabled by default — enable in theme:
- *
- * add_filter( 'webp_ac_filter_the_content', '__return_true' );
- */
-add_filter(
-	'the_content',
-	static function ( $content ) {
-		if ( ! apply_filters( 'webp_ac_filter_the_content', false ) ) {
-			return is_string( $content ) ? $content : '';
-		}
-
-		if ( ! is_string( $content ) || '' === $content || is_admin() || false === stripos( $content, '<img' ) ) {
-			return is_string( $content ) ? $content : '';
-		}
-
-		return webp_ac_replace_content_images( $content );
-	},
-	25
-);

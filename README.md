@@ -3,11 +3,12 @@
 [![Release](https://github.com/EvgeniSasim/webp-auto-converter/actions/workflows/release.yml/badge.svg)](https://github.com/EvgeniSasim/webp-auto-converter/actions/workflows/release.yml)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
 
-Open-source WordPress plugin that automatically converts uploaded JPEG and PNG images to WebP, prefers WebP in responsive `srcset`, and cleans up WebP siblings when attachments are deleted.
+Open-source WordPress plugin that automatically converts uploaded JPEG and PNG images to WebP and serves them on the front end in **plug & play** mode — no theme integration required.
 
 | | |
 |---|---|
 | **Plugin directory** | `webp-auto-converter/` |
+| **Plug & play** | On by default — [docs/theme-helpers.md](docs/theme-helpers.md) |
 | **Contributing** | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | **Security** | [SECURITY.md](SECURITY.md) |
 | **Releases** | [GitHub Releases](https://github.com/EvgeniSasim/webp-auto-converter/releases) |
@@ -17,6 +18,7 @@ Open-source WordPress plugin that automatically converts uploaded JPEG and PNG i
 
 ## Features
 
+- **Plug & play** — featured images, attachment images, post/widget content (toggle in settings)
 - Automatic WebP generation on upload (full image + all registered sizes)
 - Configurable quality in **Settings → WebP Converter**
 - Batch conversion for existing media library images
@@ -33,7 +35,9 @@ Copy `webp-auto-converter/` into `wp-content/plugins/` or symlink:
 ln -s "$(pwd)/webp-auto-converter" /path/to/wp-content/plugins/webp-auto-converter
 ```
 
-Activate in the WordPress admin, then open **Settings → WebP Converter**.
+Activate in the WordPress admin. **No theme code needed** — WebP output is automatic on the front end.
+
+Optional theme helpers for custom markup: [docs/theme-helpers.md](docs/theme-helpers.md)
 
 ### Requirements
 
@@ -58,20 +62,18 @@ pip install -r scripts/requirements-assets.txt
 python3 scripts/generate-wporg-assets.py
 ```
 
-### Theme image helpers
+### Theme image helpers (optional)
+
+Plug & play is enabled by default. Use helpers only for custom templates:
 
 ```php
-// Featured image (no ACF)
-echo webp_ac_get_the_post_thumbnail_html( null, [ 'class' => 'entry__thumb' ] );
-
-// Post meta with attachment ID
 echo webp_ac_get_image_from_post_meta( get_the_ID(), 'hero_image_id', [ 'is_lcp' => true ] );
+```
 
-// Drop-in for wp_get_attachment_image()
-echo webp_ac_wp_attachment_image( 123, 'large', [ 'class' => 'card__img' ] );
+Disable auto output in settings or via code:
 
-// Optional the_content filter
-add_filter( 'webp_ac_filter_the_content', '__return_true' );
+```php
+add_filter( 'webp_ac_auto_output_enabled', '__return_false' );
 ```
 
 Full examples: [docs/theme-helpers.md](docs/theme-helpers.md)

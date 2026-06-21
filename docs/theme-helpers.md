@@ -1,6 +1,45 @@
 # Theme helpers — image output examples
 
-Плагин подключает `includes/image-helpers.php` с функциями для вывода `<picture>` + WebP (`webp_ac_*`). **ACF не требуется** — достаточно стандартного WordPress API.
+Плагин подключает `includes/image-helpers.php` с функциями для вывода `<picture>` + WebP (`webp_ac_*`). **ACF не требуется.**
+
+## Plug & play (по умолчанию)
+
+После активации плагин **сам** улучшает картинки на фронте — тема может ничего не менять:
+
+| Источник | Что происходит |
+|----------|----------------|
+| `the_post_thumbnail()` | `<picture>` + WebP source |
+| `wp_get_attachment_image()` | то же |
+| `the_content` | замена `wp-image-*` на responsive markup |
+| Text / block widgets | замена картинок в HTML |
+
+Настройка: **Settings → WebP Converter → Plug & play front-end output**.
+
+Отключить в коде темы:
+
+```php
+add_filter( 'webp_ac_auto_output_enabled', '__return_false' );
+```
+
+Изменить `sizes` по умолчанию:
+
+```php
+add_filter( 'webp_ac_default_sizes_attr', function () {
+	return '(max-width: 768px) 100vw, 800px';
+} );
+```
+
+Пропустить auto output на отдельных запросах:
+
+```php
+add_filter( 'webp_ac_should_auto_output', function ( $should ) {
+	return is_page( 'checkout' ) ? false : $should;
+} );
+```
+
+Хелперы ниже нужны только для **кастомной вёрстки** (hero вне the loop, meta-поля в компонентах и т.д.).
+
+---
 
 ## Без ACF (WordPress API)
 
@@ -101,7 +140,7 @@ $icon_id = (int) get_post_meta( get_the_ID(), 'service_icon', true );
 echo webp_ac_icon_html( $icon_id, __( 'Consulting', 'my-theme' ), 'service-card__icon' );
 ```
 
-### Автофильтр `the_content` (выключен по умолчанию)
+### Автофильтр `the_content` (если plug & play выключен)
 
 ```php
 add_filter( 'webp_ac_filter_the_content', '__return_true' );

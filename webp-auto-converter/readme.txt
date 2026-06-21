@@ -4,19 +4,26 @@ Tags: webp, images, performance, media, optimization
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.1
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically convert uploaded JPEG and PNG images to WebP, serve WebP in responsive srcset, and clean up on delete.
+Automatically convert uploaded JPEG and PNG images to WebP and serve them on the front end with zero theme integration.
 
 == Description ==
 
-WebP Auto Converter is a lightweight WordPress plugin that creates WebP copies of your JPEG and PNG uploads. Original files are kept; WebP siblings are stored next to them in the uploads directory.
+WebP Auto Converter is a lightweight WordPress plugin that creates WebP copies of your JPEG and PNG uploads and **automatically outputs them on the front end** — no theme code required.
 
-**Features**
+**Plug & play (enabled by default)**
 
-* Automatic conversion on upload (full size and all registered image sizes)
+* Featured images (`the_post_thumbnail`)
+* `wp_get_attachment_image()` output
+* Images in post content, text widgets, and block widgets
+* Responsive `<picture>` with WebP `<source>` when sibling files exist
+
+Disable under **Settings → WebP Converter** if your theme uses custom image helpers.
+
+**Conversion**
 * Configurable WebP quality (0–100) in **Settings → WebP Converter**
 * Batch tool to generate WebP for existing media library images
 * Prefers WebP URLs in `srcset` when a sibling `.webp` file exists
@@ -28,19 +35,23 @@ WebP Auto Converter is a lightweight WordPress plugin that creates WebP copies o
 * PHP 7.4+
 * GD with WebP support (`imagewebp`) or Imagick with WebP support
 
-This plugin does not replace your theme's `<picture>` markup or server-level content negotiation. It focuses on generating WebP files and improving responsive image URLs where WordPress builds `srcset`.
-
 == Installation ==
 
 1. Upload the `webp-auto-converter` folder to `/wp-content/plugins/`.
 2. Activate the plugin through the **Plugins** menu in WordPress.
-3. Go to **Settings → WebP Converter** to set quality and optionally run batch conversion for existing images.
+3. Go to **Settings → WebP Converter** to adjust quality or batch-convert existing images. Front-end WebP output works automatically.
 
 == Frequently Asked Questions ==
 
 = Does this delete my original JPEG or PNG files? =
 
 No. The plugin creates additional `.webp` files alongside the originals.
+
+Original JPEG/PNG files are kept. With plug & play enabled, browsers that support WebP receive `<picture>` markup automatically.
+
+= Do I need to edit my theme? =
+
+No. Plug & play is on by default. Disable it in settings if your theme already outputs custom `<picture>` elements and you want to avoid double processing.
 
 = Will every visitor receive WebP images? =
 
@@ -61,6 +72,11 @@ Yes. Use **Generate WebP (batch)** on the settings page to process the media lib
 3. WebP preferred in responsive srcset
 
 == Changelog ==
+
+= 1.3.0 =
+* Plug & play mode: auto-enhance featured images, attachment images, and content (on by default)
+* Settings toggle to disable front-end auto output
+* Developer filters: `webp_ac_auto_output_enabled`, `webp_ac_should_auto_output`, `webp_ac_default_sizes_attr`
 
 = 1.2.1 =
 * WordPress-native helpers without ACF: featured image, post meta, options, wp_attachment_image drop-in
