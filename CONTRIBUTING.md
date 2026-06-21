@@ -38,4 +38,4 @@ Follow [WordPress Coding Standards](https://developer.wordpress.org/coding-stand
 
 ## Code of conduct
 
-Be respectful and constructive. Focus on the technical issue, not the person.
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). Be respectful and constructive.

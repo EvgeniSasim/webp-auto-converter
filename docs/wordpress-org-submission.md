@@ -12,7 +12,7 @@
 - [ ] Версия в `webp-auto-converter.php` совпадает со `Stable tag` в `readme.txt`.
 - [ ] `readme.txt` проходит валидацию в [Readme Validator](https://wordpress.org/plugins/developers/readme-validator/).
 - [ ] В коде нет секретов, API ключей или ссылок на тестовые стенды.
-- [ ] `uninstall.php` удаляет опцию `webp_auto_converter_quality`.
+- [ ] `uninstall.php` удаляет опции `webp_auto_converter_quality` и `webp_auto_converter_auto_output`.
 - [ ] Лицензия GPLv2 или выше (`LICENSE` в корне и в папке плагина).
 
 ## Процесс отправки

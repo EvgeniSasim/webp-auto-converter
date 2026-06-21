@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+- `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1)
+- Dependabot for GitHub Actions
+- Pull request template
+
+### Changed
+- Repository topics and homepage on GitHub
+- Branch protection on `main` (required CI check)
+- `SECURITY.md` supported versions updated for 1.3.x
+
 ## [1.3.0] - 2026-06-21
 
 ### Added
