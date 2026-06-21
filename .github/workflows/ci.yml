@@ -13,7 +13,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: PHP syntax check
-        run: php -l webp-auto-converter/webp-auto-converter.php && php -l webp-auto-converter/uninstall.php
+        run: |
+          php -l webp-auto-converter/webp-auto-converter.php
+          php -l webp-auto-converter/uninstall.php
+          php -l webp-auto-converter/includes/image-helpers.php
 
       - name: Verify readme version match
         run: |

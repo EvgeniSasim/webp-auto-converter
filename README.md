@@ -23,6 +23,7 @@ Open-source WordPress plugin that automatically converts uploaded JPEG and PNG i
 - WebP URLs in `srcset` when a sibling file exists
 - Imagick with GD fallback
 - Uninstall removes plugin options
+- **Theme helpers** for `<picture>` output — see [docs/theme-helpers.md](docs/theme-helpers.md)
 
 ## Installation
 
@@ -56,6 +57,24 @@ python3 -m venv .venv-assets && source .venv-assets/bin/activate
 pip install -r scripts/requirements-assets.txt
 python3 scripts/generate-wporg-assets.py
 ```
+
+### Theme image helpers
+
+```php
+// ACF / attachment field
+echo webp_ac_attachment_image_html( get_field( 'image' ), [
+	'class' => 'section__img',
+	'size'  => 'large',
+] );
+
+// Hero LCP image
+echo webp_ac_hero_image_html( get_field( 'hero' ), true );
+
+// Enable optional the_content filter
+add_filter( 'webp_ac_filter_the_content', '__return_true' );
+```
+
+Full examples: [docs/theme-helpers.md](docs/theme-helpers.md)
 
 ## Author
 

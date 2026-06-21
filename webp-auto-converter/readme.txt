@@ -4,7 +4,7 @@ Tags: webp, images, performance, media, optimization
 Requires at least: 5.8
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,11 @@ Yes. Use **Generate WebP (batch)** on the settings page to process the media lib
 3. WebP preferred in responsive srcset
 
 == Changelog ==
+
+= 1.2.0 =
+* Theme helper functions for responsive `<picture>` WebP output (`webp_ac_*`)
+* Optional `the_content` filter (disabled by default)
+* Documentation: docs/theme-helpers.md
 
 = 1.1.0 =
 * WordPress.org release pack: readme, uninstall cleanup, i18n text domain

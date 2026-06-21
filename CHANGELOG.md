@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## [1.2.0] - 2026-06-21
+
+### Added
+- `includes/image-helpers.php` — `webp_ac_get_image_html()`, icons, hero, content replacement
+- Optional `the_content` filter via `webp_ac_filter_the_content`
+- `docs/theme-helpers.md` with usage examples
+
 ## [1.1.0] - 2026-06-21
 
 ### Added
