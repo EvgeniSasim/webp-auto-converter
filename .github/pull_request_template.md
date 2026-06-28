@@ -12,7 +12,7 @@
 
 ## Checklist
 
-- [ ] User-facing strings use `webp-auto-converter` text domain and are escaped on output
+- [ ] User-facing strings use `privaro-webp-auto-converter` text domain and are escaped on output
 - [ ] Admin AJAX uses nonces and capability checks
 - [ ] `CHANGELOG.md` updated for user-visible changes
 - [ ] `readme.txt` **Stable tag** matches plugin header `Version:` (release PRs only)
