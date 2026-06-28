@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       WebP Auto Converter
+ * Plugin Name:       Privaro WebP Auto Converter
  * Plugin URI:        https://github.com/EvgeniSasim/webp-auto-converter
  * Description:       Converts uploaded JPEG and PNG images to WebP and automatically serves them on the front end (plug & play).
  * Version:           1.4.0
@@ -10,7 +10,7 @@
  * Author URI:        https://www.instagram.com/evgenii.sasim/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       webp-auto-converter
+ * Text Domain:       privaro-webp-auto-converter
  *
  * @package WebP_Auto_Converter
  */
@@ -42,10 +42,10 @@ add_action( 'admin_enqueue_scripts', 'webp_auto_converter_admin_assets' );
  */
 function webp_auto_converter_menu(): void {
 	add_options_page(
-		__( 'WebP Converter', 'webp-auto-converter' ),
-		__( 'WebP Converter', 'webp-auto-converter' ),
+		__( 'WebP Converter', 'privaro-webp-auto-converter' ),
+		__( 'WebP Converter', 'privaro-webp-auto-converter' ),
 		'manage_options',
-		'webp-auto-converter',
+		'privaro-webp-auto-converter',
 		'webp_auto_converter_settings_page'
 	);
 }
@@ -82,22 +82,22 @@ function webp_auto_converter_settings(): void {
 		'webp_auto_converter_main',
 		'',
 		null,
-		'webp-auto-converter'
+		'privaro-webp-auto-converter'
 	);
 
 	add_settings_field(
 		WEBP_AUTO_CONVERTER_AUTO_OUTPUT,
-		__( 'Plug & play front-end output', 'webp-auto-converter' ),
+		__( 'Plug & play front-end output', 'privaro-webp-auto-converter' ),
 		'webp_auto_converter_auto_output_field',
-		'webp-auto-converter',
+		'privaro-webp-auto-converter',
 		'webp_auto_converter_main'
 	);
 
 	add_settings_field(
 		WEBP_AUTO_CONVERTER_OPTION,
-		__( 'WebP quality (0–100)', 'webp-auto-converter' ),
+		__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ),
 		'webp_auto_converter_quality_field',
-		'webp-auto-converter',
+		'privaro-webp-auto-converter',
 		'webp_auto_converter_main'
 	);
 }
@@ -110,9 +110,9 @@ function webp_auto_converter_auto_output_field(): void {
 	echo '<input type="hidden" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="0">';
 	echo '<label>';
 	echo '<input type="checkbox" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="1" ' . checked( $value, true, false ) . '>';
-	echo ' ' . esc_html__( 'Automatically output WebP in themes (no code required)', 'webp-auto-converter' );
+	echo ' ' . esc_html__( 'Automatically output WebP in themes (no code required)', 'privaro-webp-auto-converter' );
 	echo '</label>';
-	echo '<p class="description">' . esc_html__( 'Enhances featured images, attachment images, and post/widget content with responsive <picture> markup when WebP files exist.', 'webp-auto-converter' ) . '</p>';
+	echo '<p class="description">' . esc_html__( 'Enhances featured images, attachment images, and post/widget content with responsive <picture> markup when WebP files exist.', 'privaro-webp-auto-converter' ) . '</p>';
 }
 
 /**
@@ -129,7 +129,7 @@ function webp_auto_converter_quality_field(): void {
 			min="0"
 			max="100"
 			value="<?php echo esc_attr( (string) $value ); ?>"
-			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'webp-auto-converter' ); ?>"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ); ?>"
 		>
 		<input
 			type="number"
@@ -139,14 +139,14 @@ function webp_auto_converter_quality_field(): void {
 			value="<?php echo esc_attr( (string) $value ); ?>"
 			min="0"
 			max="100"
-			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'webp-auto-converter' ); ?>"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ); ?>"
 		>
 	</div>
 	<p class="description">
-		<?php echo esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'webp-auto-converter' ); ?>
+		<?php echo esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'privaro-webp-auto-converter' ); ?>
 	</p>
 	<p class="description">
-		<?php echo esc_html__( 'Applies to new conversions. Re-run batch below to regenerate existing media.', 'webp-auto-converter' ); ?>
+		<?php echo esc_html__( 'Applies to new conversions. Re-run batch below to regenerate existing media.', 'privaro-webp-auto-converter' ); ?>
 	</p>
 	<?php
 }
@@ -238,14 +238,14 @@ function webp_auto_converter_admin_assets( string $hook_suffix ): void {
 			'nonce'              => wp_create_nonce( 'webp_auto_converter_batch' ),
 			'converterAvailable' => webp_auto_converter_gd_or_imagick_available(),
 			'i18n'               => array(
-				'start'        => __( 'Generate WebP', 'webp-auto-converter' ),
-				'running'      => __( 'Converting…', 'webp-auto-converter' ),
-				'starting'     => __( 'Starting…', 'webp-auto-converter' ),
-				'error'        => __( 'Error', 'webp-auto-converter' ),
-				'networkError' => __( 'Network error. Check your connection and try again.', 'webp-auto-converter' ),
-				'noImages'     => __( 'No JPEG or PNG images found in the media library.', 'webp-auto-converter' ),
-				'progress'     => __( 'Processed %1$s of %2$s attachments · %3$s WebP files created', 'webp-auto-converter' ),
-				'done'         => __( 'All done. %1$s WebP files created across %2$s attachments.', 'webp-auto-converter' ),
+				'start'        => __( 'Generate WebP', 'privaro-webp-auto-converter' ),
+				'running'      => __( 'Converting…', 'privaro-webp-auto-converter' ),
+				'starting'     => __( 'Starting…', 'privaro-webp-auto-converter' ),
+				'error'        => __( 'Error', 'privaro-webp-auto-converter' ),
+				'networkError' => __( 'Network error. Check your connection and try again.', 'privaro-webp-auto-converter' ),
+				'noImages'     => __( 'No JPEG or PNG images found in the media library.', 'privaro-webp-auto-converter' ),
+				'progress'     => __( 'Processed %1$s of %2$s attachments · %3$s WebP files created', 'privaro-webp-auto-converter' ),
+				'done'         => __( 'All done. %1$s WebP files created across %2$s attachments.', 'privaro-webp-auto-converter' ),
 			),
 		)
 	);
@@ -259,16 +259,16 @@ function webp_auto_converter_render_status_strip(): void {
 	$auto_output  = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
 	$converter_ok = null !== $backend;
 	?>
-	<div class="webp-ac-status" role="region" aria-label="<?php echo esc_attr__( 'Plugin status', 'webp-auto-converter' ); ?>">
+	<div class="webp-ac-status" role="region" aria-label="<?php echo esc_attr__( 'Plugin status', 'privaro-webp-auto-converter' ); ?>">
 		<p class="webp-ac-status__item">
 			<span class="webp-ac-status__dot<?php echo esc_attr( $converter_ok ? ' webp-ac-status__dot--ok' : '' ); ?>" aria-hidden="true"></span>
 			<?php
 			if ( 'imagick' === $backend ) {
-				echo esc_html__( 'Converter ready (Imagick)', 'webp-auto-converter' );
+				echo esc_html__( 'Converter ready (Imagick)', 'privaro-webp-auto-converter' );
 			} elseif ( 'gd' === $backend ) {
-				echo esc_html__( 'Converter ready (GD)', 'webp-auto-converter' );
+				echo esc_html__( 'Converter ready (GD)', 'privaro-webp-auto-converter' );
 			} else {
-				echo esc_html__( 'Converter unavailable', 'webp-auto-converter' );
+				echo esc_html__( 'Converter unavailable', 'privaro-webp-auto-converter' );
 			}
 			?>
 		</p>
@@ -276,14 +276,14 @@ function webp_auto_converter_render_status_strip(): void {
 			<span class="webp-ac-status__dot<?php echo esc_attr( $auto_output ? ' webp-ac-status__dot--ok' : ' webp-ac-status__dot--off' ); ?>" aria-hidden="true"></span>
 			<?php
 			echo $auto_output
-				? esc_html__( 'Plug & play: On', 'webp-auto-converter' )
-				: esc_html__( 'Plug & play: Off', 'webp-auto-converter' );
+				? esc_html__( 'Plug & play: On', 'privaro-webp-auto-converter' )
+				: esc_html__( 'Plug & play: Off', 'privaro-webp-auto-converter' );
 			?>
 		</p>
 		<?php if ( $converter_ok ) : ?>
 			<p class="webp-ac-status__item">
 				<span class="webp-ac-status__dot webp-ac-status__dot--ok" aria-hidden="true"></span>
-				<?php echo esc_html__( 'New uploads: WebP generated automatically', 'webp-auto-converter' ); ?>
+				<?php echo esc_html__( 'New uploads: WebP generated automatically', 'privaro-webp-auto-converter' ); ?>
 			</p>
 		<?php endif; ?>
 	</div>
@@ -301,7 +301,7 @@ function webp_auto_converter_settings_page(): void {
 	$converter_ok = webp_auto_converter_gd_or_imagick_available();
 	?>
 	<div class="wrap" id="webp-ac-settings">
-		<h1><?php echo esc_html__( 'WebP Converter', 'webp-auto-converter' ); ?></h1>
+		<h1><?php echo esc_html__( 'WebP Converter', 'privaro-webp-auto-converter' ); ?></h1>
 
 		<?php if ( ! $converter_ok ) : ?>
 			<div class="notice notice-warning">
@@ -309,7 +309,7 @@ function webp_auto_converter_settings_page(): void {
 					<?php
 					echo esc_html__(
 						'WebP conversion is unavailable on this server. Enable GD with imagewebp support or Imagick with WebP support, then refresh this page.',
-						'webp-auto-converter'
+						'privaro-webp-auto-converter'
 					);
 					?>
 				</p>
@@ -320,13 +320,13 @@ function webp_auto_converter_settings_page(): void {
 
 		<div class="postbox webp-ac-postbox">
 			<div class="postbox-header">
-				<h2 class="hndle"><?php echo esc_html__( 'Conversion settings', 'webp-auto-converter' ); ?></h2>
+				<h2 class="hndle"><?php echo esc_html__( 'Conversion settings', 'privaro-webp-auto-converter' ); ?></h2>
 			</div>
 			<div class="inside">
 				<form method="post" action="options.php">
 					<?php
 					settings_fields( 'webp_auto_converter_options' );
-					do_settings_sections( 'webp-auto-converter' );
+					do_settings_sections( 'privaro-webp-auto-converter' );
 					submit_button();
 					?>
 				</form>
@@ -335,10 +335,10 @@ function webp_auto_converter_settings_page(): void {
 
 		<div class="postbox webp-ac-postbox">
 			<div class="postbox-header">
-				<h2 class="hndle"><?php echo esc_html__( 'Existing media', 'webp-auto-converter' ); ?></h2>
+				<h2 class="hndle"><?php echo esc_html__( 'Existing media', 'privaro-webp-auto-converter' ); ?></h2>
 			</div>
 			<div class="inside">
-				<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'webp-auto-converter' ); ?></p>
+				<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'privaro-webp-auto-converter' ); ?></p>
 				<p>
 					<button
 						type="button"
@@ -346,7 +346,7 @@ function webp_auto_converter_settings_page(): void {
 						id="webp-ac-batch-start"
 						<?php disabled( ! $converter_ok ); ?>
 					>
-						<?php echo esc_html__( 'Generate WebP', 'webp-auto-converter' ); ?>
+						<?php echo esc_html__( 'Generate WebP', 'privaro-webp-auto-converter' ); ?>
 					</button>
 				</p>
 				<div
@@ -365,23 +365,23 @@ function webp_auto_converter_settings_page(): void {
 		</div>
 
 		<details class="postbox webp-ac-postbox webp-ac-dev">
-			<summary><?php echo esc_html__( 'For developers', 'webp-auto-converter' ); ?></summary>
+			<summary><?php echo esc_html__( 'For developers', 'privaro-webp-auto-converter' ); ?></summary>
 			<div class="webp-ac-dev__body">
 				<p>
 					<?php
 					echo esc_html__(
 						'Plug & play covers most themes. For custom templates, use the theme helper functions in your PHP templates.',
-						'webp-auto-converter'
+						'privaro-webp-auto-converter'
 					);
 					?>
 				</p>
 				<p>
 					<a href="<?php echo esc_url( webp_auto_converter_docs_url() ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php echo esc_html__( 'View theme helpers documentation', 'webp-auto-converter' ); ?>
-						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'webp-auto-converter' ); ?></span>
+						<?php echo esc_html__( 'View theme helpers documentation', 'privaro-webp-auto-converter' ); ?>
+						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'privaro-webp-auto-converter' ); ?></span>
 					</a>
 				</p>
-				<p><?php echo esc_html__( 'Disable auto output in code:', 'webp-auto-converter' ); ?></p>
+				<p><?php echo esc_html__( 'Disable auto output in code:', 'privaro-webp-auto-converter' ); ?></p>
 				<code class="webp-ac-dev__code">add_filter( 'webp_ac_auto_output_enabled', '__return_false' );</code>
 			</div>
 		</details>
@@ -489,7 +489,7 @@ function webp_auto_converter_ajax_batch(): void {
 	check_ajax_referer( 'webp_auto_converter_batch' );
 
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Forbidden', 'webp-auto-converter' ) ), 403 );
+		wp_send_json_error( array( 'message' => __( 'Forbidden', 'privaro-webp-auto-converter' ) ), 403 );
 	}
 
 	$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
@@ -542,12 +542,12 @@ function webp_auto_converter_ajax_batch(): void {
 		'message'         => $done
 			? sprintf(
 				/* translators: %d: number of converted files in the last batch */
-				__( 'Done. Converted %d file(s) in the last batch.', 'webp-auto-converter' ),
+				__( 'Done. Converted %d file(s) in the last batch.', 'privaro-webp-auto-converter' ),
 				$converted
 			)
 			: sprintf(
 				/* translators: 1: batch offset, 2: number of converted files */
-				__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'webp-auto-converter' ),
+				__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'privaro-webp-auto-converter' ),
 				$offset,
 				$converted
 			),

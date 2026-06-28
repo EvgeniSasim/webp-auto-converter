@@ -7,7 +7,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ZIP_PATH="${1:-${REPO_ROOT}/build/webp-auto-converter.zip}"
+ZIP_PATH="${1:-${REPO_ROOT}/build/privaro-webp-auto-converter.zip}"
 COMMENT="${2:-WebP Auto Converter 1.4.0 — review update.}"
 
 exec env WPORG_USER="${WPORG_USER:-}" WPORG_PASS="${WPORG_PASS:-}" \

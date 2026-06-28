@@ -5,12 +5,12 @@
 #   WPORG_USER=evgenij347 WPORG_PASS='app-password' bash scripts/wporg-submit-plugin.sh [zip-path]
 #
 # Defaults:
-#   zip-path -> build/webp-auto-converter.zip
+#   zip-path -> build/privaro-webp-auto-converter.zip
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ZIP_PATH="${1:-${REPO_ROOT}/build/webp-auto-converter.zip}"
+ZIP_PATH="${1:-${REPO_ROOT}/build/privaro-webp-auto-converter.zip}"
 
 if [[ -z "${WPORG_USER:-}" || -z "${WPORG_PASS:-}" ]]; then
 	echo "Set WPORG_USER and WPORG_PASS environment variables." >&2

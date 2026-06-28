@@ -8,7 +8,7 @@ set -euo pipefail
 
 VERSION="${1:-}"
 CHECKOUT_DIR="${2:-/tmp/webp-auto-converter-svn}"
-PLUGIN_SLUG="webp-auto-converter"
+PLUGIN_SLUG="privaro-webp-auto-converter"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SVN_URL="https://plugins.svn.wordpress.org/${PLUGIN_SLUG}"
 

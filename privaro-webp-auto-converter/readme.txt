@@ -1,8 +1,8 @@
-=== WebP Auto Converter ===
+=== Privaro WebP Auto Converter ===
 Contributors: evgenij347
 Tags: webp, images, performance, media, optimization
 Requires at least: 5.8
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
 Stable tag: 1.4.0
 License: GPLv2 or later
@@ -12,7 +12,7 @@ Automatically convert uploaded JPEG and PNG images to WebP and serve them on the
 
 == Description ==
 
-**WebP Auto Converter** creates WebP copies of your JPEG and PNG uploads and **automatically outputs them on the front end** — no theme code required.
+**Privaro WebP Auto Converter** creates WebP copies of your JPEG and PNG uploads and **automatically outputs them on the front end** — no theme code required.
 
 = Plug & play (enabled by default) =
 
@@ -45,7 +45,7 @@ This plugin processes images **only on your server**. It does not collect, store
 = From WordPress.org (after approval) =
 
 1. Go to **Plugins → Add New**.
-2. Search for **WebP Auto Converter**.
+2. Search for **Privaro WebP Auto Converter**.
 3. Click **Install Now**, then **Activate**.
 
 = Manual upload =
