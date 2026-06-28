@@ -2,17 +2,17 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [1.4.0] - 2026-06-21
 
 ### Added
-- `CODE_OF_CONDUCT.md` (Contributor Covenant 2.1)
-- Dependabot for GitHub Actions
-- Pull request template
+- Admin settings UI: status strip, postbox layout, batch progress bar, quality slider
+- `assets/admin.css` and `assets/admin.js` for settings screen
+- Filter `webp_ac_docs_url` for theme helpers documentation link
+- Batch AJAX fields: `total`, `processed`, `converted_batch` (backward-compatible)
 
 ### Changed
-- Repository topics and homepage on GitHub
-- Branch protection on `main` (required CI check)
-- `SECURITY.md` supported versions updated for 1.3.x
+- Settings page markup aligned with `docs/admin-ui-ux-spec.md`
+- Batch button label: «Generate WebP» (was «Generate WebP (batch)»)
 
 ## [1.3.0] - 2026-06-21
 

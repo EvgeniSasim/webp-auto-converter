@@ -3,7 +3,7 @@
  * Plugin Name:       WebP Auto Converter
  * Plugin URI:        https://github.com/EvgeniSasim/webp-auto-converter
  * Description:       Converts uploaded JPEG and PNG images to WebP and automatically serves them on the front end (plug & play).
- * Version:           1.3.0
+ * Version:           1.4.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Evgenii Sasim
@@ -17,6 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
+const WEBP_AUTO_CONVERTER_VERSION      = '1.4.0';
 const WEBP_AUTO_CONVERTER_OPTION       = 'webp_auto_converter_quality';
 const WEBP_AUTO_CONVERTER_AUTO_OUTPUT  = 'webp_auto_converter_auto_output';
 const WEBP_AUTO_CONVERTER_BATCH        = 25;
@@ -34,6 +35,7 @@ function webp_auto_converter_activate(): void {
 // --- Settings ---
 add_action( 'admin_menu', 'webp_auto_converter_menu' );
 add_action( 'admin_init', 'webp_auto_converter_settings' );
+add_action( 'admin_enqueue_scripts', 'webp_auto_converter_admin_assets' );
 
 /**
  * Register settings page under Settings.
@@ -78,7 +80,7 @@ function webp_auto_converter_settings(): void {
 
 	add_settings_section(
 		'webp_auto_converter_main',
-		__( 'Settings', 'webp-auto-converter' ),
+		'',
 		null,
 		'webp-auto-converter'
 	);
@@ -118,8 +120,174 @@ function webp_auto_converter_auto_output_field(): void {
  */
 function webp_auto_converter_quality_field(): void {
 	$value = (int) get_option( WEBP_AUTO_CONVERTER_OPTION, 82 );
-	echo '<input type="number" name="' . esc_attr( WEBP_AUTO_CONVERTER_OPTION ) . '" value="' . esc_attr( (string) $value ) . '" min="0" max="100">';
-	echo '<p class="description">' . esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'webp-auto-converter' ) . '</p>';
+	?>
+	<div class="webp-ac-quality">
+		<input
+			type="range"
+			id="webp-ac-quality-range"
+			class="webp-ac-quality__range"
+			min="0"
+			max="100"
+			value="<?php echo esc_attr( (string) $value ); ?>"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'webp-auto-converter' ); ?>"
+		>
+		<input
+			type="number"
+			id="webp-ac-quality-number"
+			class="small-text webp-ac-quality__number"
+			name="<?php echo esc_attr( WEBP_AUTO_CONVERTER_OPTION ); ?>"
+			value="<?php echo esc_attr( (string) $value ); ?>"
+			min="0"
+			max="100"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'webp-auto-converter' ); ?>"
+		>
+	</div>
+	<p class="description">
+		<?php echo esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'webp-auto-converter' ); ?>
+	</p>
+	<p class="description">
+		<?php echo esc_html__( 'Applies to new conversions. Re-run batch below to regenerate existing media.', 'webp-auto-converter' ); ?>
+	</p>
+	<?php
+}
+
+/**
+ * Detect which image backend is used for conversion.
+ *
+ * @return string|null "imagick", "gd", or null when unavailable.
+ */
+function webp_auto_converter_get_converter_backend(): ?string {
+	if ( ! webp_auto_converter_gd_or_imagick_available() ) {
+		return null;
+	}
+
+	if ( class_exists( 'Imagick' ) ) {
+		return 'imagick';
+	}
+
+	if ( function_exists( 'imagewebp' ) && function_exists( 'imagecreatefromjpeg' ) ) {
+		return 'gd';
+	}
+
+	return null;
+}
+
+/**
+ * Count JPEG/PNG attachments in the media library.
+ */
+function webp_auto_converter_count_convertible_attachments(): int {
+	$query = new WP_Query(
+		array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'post_mime_type' => array( 'image/jpeg', 'image/png' ),
+			'posts_per_page' => 1,
+			'fields'         => 'ids',
+			'no_found_rows'  => false,
+		)
+	);
+
+	return (int) $query->found_posts;
+}
+
+/**
+ * Theme helpers documentation URL.
+ */
+function webp_auto_converter_docs_url(): string {
+	/**
+	 * Filters the theme helpers documentation URL shown in admin.
+	 *
+	 * @param string $url Documentation URL.
+	 */
+	return (string) apply_filters(
+		'webp_ac_docs_url',
+		'https://github.com/EvgeniSasim/webp-auto-converter/blob/main/docs/theme-helpers.md'
+	);
+}
+
+/**
+ * Enqueue admin assets on the settings screen.
+ *
+ * @param string $hook_suffix Current admin page hook suffix.
+ */
+function webp_auto_converter_admin_assets( string $hook_suffix ): void {
+	if ( 'settings_page_webp-auto-converter' !== $hook_suffix ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'webp-ac-admin',
+		plugins_url( 'assets/admin.css', __FILE__ ),
+		array(),
+		WEBP_AUTO_CONVERTER_VERSION
+	);
+
+	wp_enqueue_script(
+		'webp-ac-admin',
+		plugins_url( 'assets/admin.js', __FILE__ ),
+		array(),
+		WEBP_AUTO_CONVERTER_VERSION,
+		true
+	);
+
+	wp_localize_script(
+		'webp-ac-admin',
+		'webpAcAdmin',
+		array(
+			'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
+			'nonce'              => wp_create_nonce( 'webp_auto_converter_batch' ),
+			'converterAvailable' => webp_auto_converter_gd_or_imagick_available(),
+			'i18n'               => array(
+				'start'        => __( 'Generate WebP', 'webp-auto-converter' ),
+				'running'      => __( 'Converting…', 'webp-auto-converter' ),
+				'starting'     => __( 'Starting…', 'webp-auto-converter' ),
+				'error'        => __( 'Error', 'webp-auto-converter' ),
+				'networkError' => __( 'Network error. Check your connection and try again.', 'webp-auto-converter' ),
+				'noImages'     => __( 'No JPEG or PNG images found in the media library.', 'webp-auto-converter' ),
+				'progress'     => __( 'Processed %1$s of %2$s attachments · %3$s WebP files created', 'webp-auto-converter' ),
+				'done'         => __( 'All done. %1$s WebP files created across %2$s attachments.', 'webp-auto-converter' ),
+			),
+		)
+	);
+}
+
+/**
+ * Render the read-only status strip.
+ */
+function webp_auto_converter_render_status_strip(): void {
+	$backend      = webp_auto_converter_get_converter_backend();
+	$auto_output  = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
+	$converter_ok = null !== $backend;
+	?>
+	<div class="webp-ac-status" role="region" aria-label="<?php echo esc_attr__( 'Plugin status', 'webp-auto-converter' ); ?>">
+		<p class="webp-ac-status__item">
+			<span class="webp-ac-status__dot<?php echo esc_attr( $converter_ok ? ' webp-ac-status__dot--ok' : '' ); ?>" aria-hidden="true"></span>
+			<?php
+			if ( 'imagick' === $backend ) {
+				echo esc_html__( 'Converter ready (Imagick)', 'webp-auto-converter' );
+			} elseif ( 'gd' === $backend ) {
+				echo esc_html__( 'Converter ready (GD)', 'webp-auto-converter' );
+			} else {
+				echo esc_html__( 'Converter unavailable', 'webp-auto-converter' );
+			}
+			?>
+		</p>
+		<p class="webp-ac-status__item">
+			<span class="webp-ac-status__dot<?php echo esc_attr( $auto_output ? ' webp-ac-status__dot--ok' : ' webp-ac-status__dot--off' ); ?>" aria-hidden="true"></span>
+			<?php
+			echo $auto_output
+				? esc_html__( 'Plug & play: On', 'webp-auto-converter' )
+				: esc_html__( 'Plug & play: Off', 'webp-auto-converter' );
+			?>
+		</p>
+		<?php if ( $converter_ok ) : ?>
+			<p class="webp-ac-status__item">
+				<span class="webp-ac-status__dot webp-ac-status__dot--ok" aria-hidden="true"></span>
+				<?php echo esc_html__( 'New uploads: WebP generated automatically', 'webp-auto-converter' ); ?>
+			</p>
+		<?php endif; ?>
+	</div>
+	<?php
 }
 
 /**
@@ -129,62 +297,94 @@ function webp_auto_converter_settings_page(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
+
+	$converter_ok = webp_auto_converter_gd_or_imagick_available();
 	?>
-	<div class="wrap">
+	<div class="wrap" id="webp-ac-settings">
 		<h1><?php echo esc_html__( 'WebP Converter', 'webp-auto-converter' ); ?></h1>
-		<form method="post" action="options.php">
-			<?php
-			settings_fields( 'webp_auto_converter_options' );
-			do_settings_sections( 'webp-auto-converter' );
-			submit_button();
-			?>
-		</form>
-		<hr>
-		<h2><?php echo esc_html__( 'Existing media', 'webp-auto-converter' ); ?></h2>
-		<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'webp-auto-converter' ); ?></p>
-		<p>
-			<button type="button" class="button button-primary" id="webp-regenerate-start"><?php echo esc_html__( 'Generate WebP (batch)', 'webp-auto-converter' ); ?></button>
-			<span id="webp-regenerate-status" style="margin-left:12px;"></span>
-		</p>
-		<script>
-		(function () {
-			const btn = document.getElementById('webp-regenerate-start');
-			const status = document.getElementById('webp-regenerate-status');
-			if (!btn || !status) return;
 
-			let offset = 0;
-			let running = false;
+		<?php if ( ! $converter_ok ) : ?>
+			<div class="notice notice-warning">
+				<p>
+					<?php
+					echo esc_html__(
+						'WebP conversion is unavailable on this server. Enable GD with imagewebp support or Imagick with WebP support, then refresh this page.',
+						'webp-auto-converter'
+					);
+					?>
+				</p>
+			</div>
+		<?php endif; ?>
 
-			btn.addEventListener('click', async function () {
-				if (running) return;
-				running = true;
-				offset = 0;
-				btn.disabled = true;
-				status.textContent = <?php echo wp_json_encode( __( 'Starting…', 'webp-auto-converter' ) ); ?>;
+		<?php webp_auto_converter_render_status_strip(); ?>
 
-				while (true) {
-					const body = new URLSearchParams();
-					body.set('action', 'webp_auto_converter_batch');
-					body.set('offset', String(offset));
-					body.set('_ajax_nonce', '<?php echo esc_js( wp_create_nonce( 'webp_auto_converter_batch' ) ); ?>');
+		<div class="postbox webp-ac-postbox">
+			<div class="postbox-header">
+				<h2 class="hndle"><?php echo esc_html__( 'Conversion settings', 'webp-auto-converter' ); ?></h2>
+			</div>
+			<div class="inside">
+				<form method="post" action="options.php">
+					<?php
+					settings_fields( 'webp_auto_converter_options' );
+					do_settings_sections( 'webp-auto-converter' );
+					submit_button();
+					?>
+				</form>
+			</div>
+		</div>
 
-					const res = await fetch(ajaxurl, { method: 'POST', body, credentials: 'same-origin' });
-					const data = await res.json();
-					if (!data.success) {
-						status.textContent = data.data?.message || <?php echo wp_json_encode( __( 'Error', 'webp-auto-converter' ) ); ?>;
-						break;
-					}
-					const payload = data.data;
-					offset = payload.next_offset;
-					status.textContent = payload.message;
-					if (payload.done) break;
-				}
+		<div class="postbox webp-ac-postbox">
+			<div class="postbox-header">
+				<h2 class="hndle"><?php echo esc_html__( 'Existing media', 'webp-auto-converter' ); ?></h2>
+			</div>
+			<div class="inside">
+				<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'webp-auto-converter' ); ?></p>
+				<p>
+					<button
+						type="button"
+						class="button button-primary"
+						id="webp-ac-batch-start"
+						<?php disabled( ! $converter_ok ); ?>
+					>
+						<?php echo esc_html__( 'Generate WebP', 'webp-auto-converter' ); ?>
+					</button>
+				</p>
+				<div
+					id="webp-ac-batch-progress"
+					class="webp-ac-progress"
+					role="progressbar"
+					aria-valuemin="0"
+					aria-valuemax="100"
+					aria-valuenow="0"
+					hidden
+				>
+					<div id="webp-ac-batch-progress-bar" class="webp-ac-progress__bar"></div>
+				</div>
+				<p id="webp-ac-batch-status" class="webp-ac-batch-status" aria-live="polite" aria-atomic="true"></p>
+			</div>
+		</div>
 
-				btn.disabled = false;
-				running = false;
-			});
-		})();
-		</script>
+		<details class="postbox webp-ac-postbox webp-ac-dev">
+			<summary><?php echo esc_html__( 'For developers', 'webp-auto-converter' ); ?></summary>
+			<div class="webp-ac-dev__body">
+				<p>
+					<?php
+					echo esc_html__(
+						'Plug & play covers most themes. For custom templates, use the theme helper functions in your PHP templates.',
+						'webp-auto-converter'
+					);
+					?>
+				</p>
+				<p>
+					<a href="<?php echo esc_url( webp_auto_converter_docs_url() ); ?>" target="_blank" rel="noopener noreferrer">
+						<?php echo esc_html__( 'View theme helpers documentation', 'webp-auto-converter' ); ?>
+						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'webp-auto-converter' ); ?></span>
+					</a>
+				</p>
+				<p><?php echo esc_html__( 'Disable auto output in code:', 'webp-auto-converter' ); ?></p>
+				<code class="webp-ac-dev__code">add_filter( 'webp_ac_auto_output_enabled', '__return_false' );</code>
+			</div>
+		</details>
 	</div>
 	<?php
 }
@@ -328,27 +528,36 @@ function webp_auto_converter_ajax_batch(): void {
 		}
 	}
 
+	$batch_count = count( $query->posts );
+	$processed   = $offset + $batch_count;
 	$next_offset = $offset + WEBP_AUTO_CONVERTER_BATCH;
-	$done        = $query->post_count < WEBP_AUTO_CONVERTER_BATCH;
+	$done        = $batch_count < WEBP_AUTO_CONVERTER_BATCH;
+	$total       = 0 === $offset ? webp_auto_converter_count_convertible_attachments() : null;
 
-	wp_send_json_success(
-		array(
-			'done'        => $done,
-			'next_offset' => $done ? $offset : $next_offset,
-			'message'     => $done
-				? sprintf(
-					/* translators: %d: number of converted files in the last batch */
-					__( 'Done. Converted %d file(s) in the last batch.', 'webp-auto-converter' ),
-					$converted
-				)
-				: sprintf(
-					/* translators: 1: batch offset, 2: number of converted files */
-					__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'webp-auto-converter' ),
-					$offset,
-					$converted
-				),
-		)
+	$response = array(
+		'done'            => $done,
+		'next_offset'     => $done ? $offset : $next_offset,
+		'processed'       => $processed,
+		'converted_batch' => $converted,
+		'message'         => $done
+			? sprintf(
+				/* translators: %d: number of converted files in the last batch */
+				__( 'Done. Converted %d file(s) in the last batch.', 'webp-auto-converter' ),
+				$converted
+			)
+			: sprintf(
+				/* translators: 1: batch offset, 2: number of converted files */
+				__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'webp-auto-converter' ),
+				$offset,
+				$converted
+			),
 	);
+
+	if ( null !== $total ) {
+		$response['total'] = $total;
+	}
+
+	wp_send_json_success( $response );
 }
 
 /**
