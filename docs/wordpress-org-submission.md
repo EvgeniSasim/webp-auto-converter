@@ -1,78 +1,52 @@
 # WordPress.org Submission Guide
 
-Этот документ содержит чеклист и инструкции для отправки плагина в официальный репозиторий WordPress.org.
+Чеклист для отправки **WebP Auto Converter** в официальный репозиторий WordPress.org.
 
 ## Подготовка аккаунта
 
-- [ ] Зарегистрируйте аккаунт на [WordPress.org](https://login.wordpress.org/register), если его ещё нет.
-- [ ] Username должен совпадать с `evgeniisasim` (указан в `Contributors` в `readme.txt`).
+- Username в `Contributors` readme.txt: **`evgenij347`**
+- Аккаунт: https://profiles.wordpress.org/evgenij347/
 
-## Чеклист перед отправкой
+## Чеклист перед отправкой (уроки из Privaro review)
 
-- [ ] Версия в `webp-auto-converter.php` совпадает со `Stable tag` в `readme.txt`.
-- [ ] `readme.txt` проходит валидацию в [Readme Validator](https://wordpress.org/plugins/developers/readme-validator/).
-- [ ] В коде нет секретов, API ключей или ссылок на тестовые стенды.
-- [ ] `uninstall.php` удаляет опции `webp_auto_converter_quality` и `webp_auto_converter_auto_output`.
-- [ ] Лицензия GPLv2 или выше (`LICENSE` в корне и в папке плагина).
+- [ ] Версия в `webp-auto-converter.php` = `Stable tag` в `readme.txt`
+- [ ] [Readme Validator](https://wordpress.org/plugins/developers/readme-validator/) без ошибок
+- [ ] Нет секретов, тестовых URL, `deactivate_plugins()` при активации
+- [ ] Весь вывод в админке/фронте экранирован (`esc_html`, `esc_attr`, `esc_url`)
+- [ ] AJAX: nonce + `manage_options`
+- [ ] `uninstall.php` удаляет опции; поведение с `.webp` файлами описано в FAQ
+- [ ] Секции **Privacy**, **External services** в readme.txt (локальная обработка, без phone-home)
+- [ ] GPL `LICENSE` в корне и в папке плагина
+- [ ] ZIP через `bash scripts/build-release.sh` (без dev-файлов)
 
-## Процесс отправки
-
-1. Соберите ZIP:
-
-   ```bash
-   bash scripts/build-release.sh
-   ```
-
-2. Откройте [Add your plugin](https://wordpress.org/plugins/add/).
-3. Загрузите `build/webp-auto-converter.zip`.
-4. Дождитесь ручного ревью (обычно 1–2 недели).
-
-## Работа с SVN (после аппрува)
-
-После одобрения будет доступен SVN-репозиторий `webp-auto-converter`.
-
-### Структура SVN
-
-- `/trunk` — содержимое папки `webp-auto-converter/`
-- `/tags/1.1.0` — копия trunk для релиза (версия = Stable tag)
-- `/assets` — иконки, баннеры, скриншоты из `wordpress-org/assets/`
-
-### Assets и релиз
-
-Сгенерировать PNG локально:
+## Отправка на ревью
 
 ```bash
-python3 -m venv .venv-assets && source .venv-assets/bin/activate
-pip install -r scripts/requirements-assets.txt
+bash scripts/build-release.sh
+python3 scripts/generate-wporg-assets.py   # опционально, для SVN после аппрува
+
+# Автоматическая загрузка (нужен app password; 2FA может блокировать curl):
+WPORG_USER=evgenij347 WPORG_PASS='...' bash scripts/wporg-submit-plugin.sh
+```
+
+Или вручную: [Add your plugin](https://wordpress.org/plugins/developers/add/) → загрузить `build/webp-auto-converter.zip`.
+
+Повторная загрузка во время ревью:
+
+```bash
+WPORG_USER=... WPORG_PASS='...' bash scripts/wporg-upload-update.sh
+```
+
+## SVN (после аппрува)
+
+```bash
 python3 scripts/generate-wporg-assets.py
-```
-
-Загрузить assets в SVN:
-
-```bash
 bash scripts/svn-upload-assets.sh
+bash scripts/svn-publish-release.sh 1.4.0
 ```
 
-Опубликовать trunk + tag:
-
-```bash
-bash scripts/svn-publish-release.sh 1.1.0
-```
-
-### Ручной checkout
-
-```bash
-svn co https://plugins.svn.wordpress.org/webp-auto-converter/ my-plugin-svn
-```
-
-## Важные правила
+## Правила
 
 - Text domain: `webp-auto-converter`
-- Не включайте `node_modules` или `vendor` в ZIP (`build-release.sh` исключает лишнее через `.distignore`)
-- Плагин не отправляет данные на внешние серверы — конвертация локальная (GD/Imagick)
-
-## После публикации
-
-1. Обновите `Plugin URI` в заголовке плагина на `https://wordpress.org/plugins/webp-auto-converter/`
-2. Добавьте ссылку в корневой `README.md`
-3. Для переводов используйте [GlotPress](https://translate.wordpress.org/) после появления плагина в каталоге
+- Плагин **не** обращается к внешним API — конвертация локальная
+- После публикации обновить `Plugin URI` на `https://wordpress.org/plugins/webp-auto-converter/`

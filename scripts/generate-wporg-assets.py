@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "wordpress-org" / "assets"
+DOCS = ROOT / "docs" / "assets"
 
 TEAL = (13, 148, 136)
 TEAL_DARK = (15, 118, 110)
@@ -67,7 +68,23 @@ def make_banner(width: int, height: int) -> Image.Image:
 	title = load_font(max(28, height // 7), bold=True)
 	sub = load_font(max(16, height // 12))
 	draw.text((width // 3, height // 2 - height // 5), "WebP Auto Converter", fill=WHITE, font=title)
-	draw.text((width // 3, height // 2 + height // 12), "Automatic WebP for WordPress uploads", fill=(220, 245, 242), font=sub)
+	draw.text((width // 3, height // 2 + height // 12), "Plug & play WebP for WordPress uploads", fill=(220, 245, 242), font=sub)
+	return img
+
+
+def make_social_preview() -> Image.Image:
+	width, height = 1280, 640
+	img = Image.new("RGB", (width, height), TEAL)
+	draw = ImageDraw.Draw(img)
+	for x in range(width):
+		shade = int(TEAL[0] + (TEAL_DARK[0] - TEAL[0]) * x / width)
+		draw.line([(x, 0), (x, height)], fill=(shade, TEAL[1], TEAL[2]))
+	draw_webp_badge(draw, 120, height // 2, 160)
+	title = load_font(48, bold=True)
+	sub = load_font(24)
+	draw.text((280, 200), "WebP Auto Converter", fill=WHITE, font=title)
+	draw.text((280, 270), "Automatic WebP conversion — plug & play front-end output", fill=(220, 245, 242), font=sub)
+	draw.text((280, 330), "Upload · Batch · srcset · Imagick/GD", fill=(180, 220, 215), font=load_font(20))
 	return img
 
 
@@ -94,10 +111,14 @@ def make_screenshot(index: int, title: str, subtitle: str) -> Image.Image:
 
 	if index == 1:
 		rounded_rect(draw, (220, 180, 1180, 620), 12, CARD)
-		draw.text((250, 210), "WebP quality (0–100)", fill=(30, 41, 59), font=load_font(22, bold=True))
-		draw.text((250, 260), "82", fill=(30, 41, 59), font=load_font(28, bold=True))
-		draw.text((250, 320), "Generate WebP (batch)", fill=WHITE, font=load_font(16, bold=True))
-		rounded_rect(draw, (250, 300, 470, 350), 8, TEAL)
+		draw.text((250, 200), "Plugin status", fill=MUTED, font=load_font(14, bold=True))
+		draw.text((250, 230), "Converter ready (Imagick) · Plug & play: On", fill=TEAL_DARK, font=load_font(16))
+		draw.text((250, 280), "WebP quality", fill=(30, 41, 59), font=load_font(22, bold=True))
+		draw.rounded_rectangle((250, 320, 650, 340), radius=6, fill=(226, 232, 240))
+		draw.rounded_rectangle((250, 320, 520, 340), radius=6, fill=TEAL)
+		draw.text((250, 360), "82", fill=(30, 41, 59), font=load_font(20, bold=True))
+		rounded_rect(draw, (250, 400, 420, 440), 8, TEAL)
+		draw.text((275, 412), "Generate WebP", fill=WHITE, font=load_font(15, bold=True))
 	elif index == 2:
 		rows = [
 			("photo.jpg", "photo.webp", "Converted"),
@@ -117,9 +138,27 @@ def make_screenshot(index: int, title: str, subtitle: str) -> Image.Image:
 		draw.text((240, 300), "image-768x512.webp", fill=TEAL_DARK, font=load_font(18, bold=True))
 		draw.text((240, 350), "Original JPEG/PNG files are kept", fill=MUTED, font=load_font(18))
 
-	watermark = load_font(14)
-	draw.text((220, height - 36), "Mock screenshot for WordPress.org listing — replace with live captures when available.", fill=(148, 163, 184), font=watermark)
 	return img
+
+
+def sync_docs_assets(assets: dict[str, Image.Image]) -> None:
+	DOCS.mkdir(parents=True, exist_ok=True)
+	mapping = {
+		"icon-256x256.png": "icon-256x256.png",
+		"banner-1544x500.png": "hero-banner.png",
+		"social-preview.png": "social-preview.png",
+	}
+	for src_name, dest_name in mapping.items():
+		if src_name in assets:
+			img = assets[src_name]
+			if img.mode == "RGBA":
+				img.save(DOCS / dest_name, "PNG")
+			else:
+				img.convert("RGB").save(DOCS / dest_name, "PNG")
+	for i in range(1, 4):
+		key = f"screenshot-{i}.png"
+		if key in assets:
+			assets[key].save(DOCS / key, "PNG")
 
 
 def main() -> None:
@@ -129,6 +168,7 @@ def main() -> None:
 		"icon-256x256.png": make_icon(256),
 		"banner-772x250.png": make_banner(772, 250),
 		"banner-1544x500.png": make_banner(1544, 500),
+		"social-preview.png": make_social_preview(),
 	}
 	screens = [
 		(1, "Quality settings", "Configure WebP quality and run batch conversion."),
@@ -145,6 +185,9 @@ def main() -> None:
 		else:
 			image.convert("RGB").save(path, "PNG")
 		print(f"Wrote {path}")
+
+	sync_docs_assets(assets)
+	print(f"Synced docs assets to {DOCS}")
 
 
 if __name__ == "__main__":

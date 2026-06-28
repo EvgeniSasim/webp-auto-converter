@@ -4,6 +4,7 @@
 
 | Version | Supported |
 | ------- | --------- |
+| 1.4.x   | Yes       |
 | 1.3.x   | Yes       |
 | 1.2.x   | Yes       |
 | 1.1.x   | Yes       |
@@ -16,7 +17,7 @@ Security fixes are released for the current stable branch. Upgrade via WordPress
 **Please do not report security issues in public GitHub issues.**
 
 1. Use [GitHub Security Advisories](https://github.com/EvgeniSasim/webp-auto-converter/security/advisories/new) (preferred), or
-2. Contact the maintainer via the email linked on their [WordPress.org profile](https://profiles.wordpress.org/evgeniisasim/).
+2. Contact the maintainer via the [WordPress.org profile](https://profiles.wordpress.org/evgenij347/).
 
 Include:
 
