@@ -2,7 +2,7 @@
 /**
  * Plug-and-play front-end output: hooks WordPress image APIs automatically.
  *
- * @package WebP_Auto_Converter
+ * @package Sasim_WebP_Auto_Converter
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -10,22 +10,22 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Whether automatic front-end image enhancement is enabled.
  */
-function webp_ac_is_auto_output_enabled(): bool {
-	$enabled = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
+function saswac_is_auto_output_enabled(): bool {
+	$enabled = (bool) get_option( SASWAC_AUTO_OUTPUT, true );
 
 	/**
 	 * Override plug-and-play mode.
 	 *
 	 * @param bool $enabled Whether auto output is on.
 	 */
-	return (bool) apply_filters( 'webp_ac_auto_output_enabled', $enabled );
+	return (bool) apply_filters( 'saswac_auto_output_enabled', $enabled );
 }
 
 /**
  * Whether auto output should run for the current request.
  */
-function webp_ac_should_auto_output(): bool {
-	if ( ! webp_ac_is_auto_output_enabled() ) {
+function saswac_should_auto_output(): bool {
+	if ( ! saswac_is_auto_output_enabled() ) {
 		return false;
 	}
 
@@ -42,7 +42,7 @@ function webp_ac_should_auto_output(): bool {
 	 *
 	 * @param bool $should Whether to enhance images on this request.
 	 */
-	return (bool) apply_filters( 'webp_ac_should_auto_output', true );
+	return (bool) apply_filters( 'saswac_should_auto_output', true );
 }
 
 /**
@@ -52,7 +52,7 @@ function webp_ac_should_auto_output(): bool {
  * @param string                     $html Existing HTML for class fallback.
  * @return array<string,mixed>
  */
-function webp_ac_parse_attrs_for_image_args( $attr, string $html = '' ): array {
+function saswac_parse_attrs_for_image_args( $attr, string $html = '' ): array {
 	$args = array();
 
 	if ( is_string( $attr ) && '' !== $attr ) {
@@ -84,7 +84,7 @@ function webp_ac_parse_attrs_for_image_args( $attr, string $html = '' ): array {
 /**
  * Skip HTML that is already enhanced or not a raster image tag.
  */
-function webp_ac_should_skip_html_replacement( string $html, int $attachment_id = 0 ): bool {
+function saswac_should_skip_html_replacement( string $html, int $attachment_id = 0 ): bool {
 	if ( '' === $html || false !== stripos( $html, '<picture' ) ) {
 		return true;
 	}
@@ -108,15 +108,15 @@ function webp_ac_should_skip_html_replacement( string $html, int $attachment_id 
  * @param bool                $icon            Mime icon flag.
  * @param array<string,mixed> $attr            Attributes.
  */
-function webp_ac_filter_wp_get_attachment_image( string $html, int $attachment_id, $size, bool $icon, $attr ): string {
-	if ( $icon || ! webp_ac_should_auto_output() || webp_ac_should_skip_html_replacement( $html, $attachment_id ) ) {
+function saswac_filter_wp_get_attachment_image( string $html, int $attachment_id, $size, bool $icon, $attr ): string {
+	if ( $icon || ! saswac_should_auto_output() || saswac_should_skip_html_replacement( $html, $attachment_id ) ) {
 		return $html;
 	}
 
-	$args            = webp_ac_parse_attrs_for_image_args( $attr, $html );
+	$args            = saswac_parse_attrs_for_image_args( $attr, $html );
 	$args['size']    = $size;
-	$args['sizes']   = $args['sizes'] ?? webp_ac_default_sizes_attr();
-	$replacement     = webp_ac_get_image_html( $attachment_id, $args );
+	$args['sizes']   = $args['sizes'] ?? saswac_default_sizes_attr();
+	$replacement     = saswac_get_image_html( $attachment_id, $args );
 
 	return '' !== $replacement ? $replacement : $html;
 }
@@ -130,17 +130,17 @@ function webp_ac_filter_wp_get_attachment_image( string $html, int $attachment_i
  * @param string|int[]        $size               Image size.
  * @param array<string,mixed> $attr               Attributes.
  */
-function webp_ac_filter_post_thumbnail_html( string $html, int $post_id, int $post_thumbnail_id, $size, $attr ): string {
+function saswac_filter_post_thumbnail_html( string $html, int $post_id, int $post_thumbnail_id, $size, $attr ): string {
 	unset( $post_id );
 
-	if ( ! webp_ac_should_auto_output() || $post_thumbnail_id <= 0 || webp_ac_should_skip_html_replacement( $html, $post_thumbnail_id ) ) {
+	if ( ! saswac_should_auto_output() || $post_thumbnail_id <= 0 || saswac_should_skip_html_replacement( $html, $post_thumbnail_id ) ) {
 		return $html;
 	}
 
-	$args          = webp_ac_parse_attrs_for_image_args( $attr, $html );
+	$args          = saswac_parse_attrs_for_image_args( $attr, $html );
 	$args['size']  = $size;
-	$args['sizes'] = $args['sizes'] ?? webp_ac_default_sizes_attr();
-	$replacement   = webp_ac_get_image_html( $post_thumbnail_id, $args );
+	$args['sizes'] = $args['sizes'] ?? saswac_default_sizes_attr();
+	$replacement   = saswac_get_image_html( $post_thumbnail_id, $args );
 
 	return '' !== $replacement ? $replacement : $html;
 }
@@ -148,27 +148,27 @@ function webp_ac_filter_post_thumbnail_html( string $html, int $post_id, int $po
 /**
  * Default sizes attribute for auto-enhanced images.
  */
-function webp_ac_default_sizes_attr(): string {
+function saswac_default_sizes_attr(): string {
 	/**
 	 * Default `sizes` for plug-and-play output.
 	 *
 	 * @param string $sizes sizes attribute value.
 	 */
-	return (string) apply_filters( 'webp_ac_default_sizes_attr', '(max-width: 768px) 100vw, 1200px' );
+	return (string) apply_filters( 'saswac_default_sizes_attr', '(max-width: 768px) 100vw, 1200px' );
 }
 
 /**
  * Filter post / widget HTML content.
  */
-function webp_ac_filter_html_content( string $content ): string {
-	if ( ! webp_ac_should_auto_output() || '' === $content || false === stripos( $content, '<img' ) ) {
+function saswac_filter_html_content( string $content ): string {
+	if ( ! saswac_should_auto_output() || '' === $content || false === stripos( $content, '<img' ) ) {
 		return $content;
 	}
 
-	return webp_ac_replace_content_images(
+	return saswac_replace_content_images(
 		$content,
 		array(
-			'sizes' => webp_ac_default_sizes_attr(),
+			'sizes' => saswac_default_sizes_attr(),
 		)
 	);
 }
@@ -178,12 +178,12 @@ function webp_ac_filter_html_content( string $content ): string {
  *
  * @param string $content Post content.
  */
-function webp_ac_filter_the_content_legacy( string $content ): string {
-	if ( webp_ac_is_auto_output_enabled() ) {
+function saswac_filter_the_content_legacy( string $content ): string {
+	if ( saswac_is_auto_output_enabled() ) {
 		return $content;
 	}
 
-	if ( ! apply_filters( 'webp_ac_filter_the_content', false ) ) {
+	if ( ! apply_filters( 'saswac_filter_the_content', false ) ) {
 		return $content;
 	}
 
@@ -191,19 +191,19 @@ function webp_ac_filter_the_content_legacy( string $content ): string {
 		return $content;
 	}
 
-	return webp_ac_replace_content_images( $content );
+	return saswac_replace_content_images( $content );
 }
 
 /**
  * Register plug-and-play hooks.
  */
-function webp_ac_register_auto_output_hooks(): void {
-	add_filter( 'wp_get_attachment_image', 'webp_ac_filter_wp_get_attachment_image', 20, 5 );
-	add_filter( 'post_thumbnail_html', 'webp_ac_filter_post_thumbnail_html', 20, 5 );
-	add_filter( 'the_content', 'webp_ac_filter_html_content', 25 );
-	add_filter( 'widget_text_content', 'webp_ac_filter_html_content', 25 );
-	add_filter( 'widget_block_content', 'webp_ac_filter_html_content', 25 );
-	add_filter( 'the_content', 'webp_ac_filter_the_content_legacy', 26 );
+function saswac_register_auto_output_hooks(): void {
+	add_filter( 'wp_get_attachment_image', 'saswac_filter_wp_get_attachment_image', 20, 5 );
+	add_filter( 'post_thumbnail_html', 'saswac_filter_post_thumbnail_html', 20, 5 );
+	add_filter( 'the_content', 'saswac_filter_html_content', 25 );
+	add_filter( 'widget_text_content', 'saswac_filter_html_content', 25 );
+	add_filter( 'widget_block_content', 'saswac_filter_html_content', 25 );
+	add_filter( 'the_content', 'saswac_filter_the_content_legacy', 26 );
 }
 
-webp_ac_register_auto_output_hooks();
+saswac_register_auto_output_hooks();

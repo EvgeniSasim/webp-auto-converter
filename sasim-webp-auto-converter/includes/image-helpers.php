@@ -2,7 +2,7 @@
 /**
  * Theme-friendly helpers for responsive <picture> output with WebP.
  *
- * @package WebP_Auto_Converter
+ * @package Sasim_WebP_Auto_Converter
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
  * @param mixed $image Attachment ID, URL, or image array.
  * @return array{ID:int,url?:string,alt?:string,decorative?:bool,context_label?:string}|null
  */
-function webp_ac_normalize_image( $image ): ?array {
+function saswac_normalize_image( $image ): ?array {
 	if ( null === $image || false === $image || '' === $image ) {
 		return null;
 	}
@@ -60,14 +60,14 @@ function webp_ac_normalize_image( $image ): ?array {
  *
  * @param string $url JPEG or PNG URL.
  */
-function webp_ac_get_webp_url( string $url ): string {
+function saswac_get_webp_url( string $url ): string {
 	if ( '' === $url ) {
 		return '';
 	}
 
-	$webp = webp_auto_converter_url_to_webp( $url );
+	$webp = saswac_url_to_webp( $url );
 
-	return webp_auto_converter_url_file_exists( $webp ) ? $webp : '';
+	return saswac_url_file_exists( $webp ) ? $webp : '';
 }
 
 /**
@@ -75,7 +75,7 @@ function webp_ac_get_webp_url( string $url ): string {
  *
  * @param string $srcset Original srcset attribute value.
  */
-function webp_ac_srcset_to_webp( string $srcset ): string {
+function saswac_srcset_to_webp( string $srcset ): string {
 	if ( '' === $srcset ) {
 		return '';
 	}
@@ -89,7 +89,7 @@ function webp_ac_srcset_to_webp( string $srcset ): string {
  * @param array<string,mixed> $attrs Image attributes.
  * @param string              $class Optional CSS class.
  */
-function webp_ac_build_img_tag( array $attrs, string $class = '' ): string {
+function saswac_build_img_tag( array $attrs, string $class = '' ): string {
 	$html = '<img';
 
 	foreach ( $attrs as $key => $value ) {
@@ -124,7 +124,7 @@ function webp_ac_build_img_tag( array $attrs, string $class = '' ): string {
  * @param array<string,mixed> $img           Normalized image data.
  * @param bool                $decorative    Whether the image is decorative.
  */
-function webp_ac_resolve_image_alt( int $attachment_id, array $img, bool $decorative = false ): string {
+function saswac_resolve_image_alt( int $attachment_id, array $img, bool $decorative = false ): string {
 	if ( $decorative ) {
 		return '';
 	}
@@ -158,7 +158,7 @@ function webp_ac_resolve_image_alt( int $attachment_id, array $img, bool $decora
  * @param bool                $decorative  Decorative flag.
  * @return array<string,mixed>
  */
-function webp_ac_apply_image_a11y_attrs( array $attrs, string $alt, bool $decorative ): array {
+function saswac_apply_image_a11y_attrs( array $attrs, string $alt, bool $decorative ): array {
 	$attrs['alt'] = $alt;
 
 	if ( $decorative ) {
@@ -185,8 +185,8 @@ function webp_ac_apply_image_a11y_attrs( array $attrs, string $alt, bool $decora
  *     @type string $context_label Fallback alt context for icons.
  * }
  */
-function webp_ac_get_image_html( $img, array $args = array() ): string {
-	$img = webp_ac_normalize_image( $img );
+function saswac_get_image_html( $img, array $args = array() ): string {
+	$img = saswac_normalize_image( $img );
 	if ( ! $img ) {
 		return '';
 	}
@@ -220,7 +220,7 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
 	$class        = (string) $args['class'];
 	$sizes        = esc_attr( (string) $args['sizes'] );
 	$loading_attr = $args['is_lcp'] ? 'eager' : (string) $args['loading'];
-	$alt          = webp_ac_resolve_image_alt( $id, $img, $decorative );
+	$alt          = saswac_resolve_image_alt( $id, $img, $decorative );
 
 	if ( 'image/svg+xml' === $mime_type ) {
 		$url = wp_get_attachment_url( $id );
@@ -249,9 +249,9 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
 			$attrs['fetchpriority'] = 'high';
 		}
 
-		$attrs = webp_ac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
+		$attrs = saswac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
 
-		return webp_ac_build_img_tag( $attrs, $class );
+		return saswac_build_img_tag( $attrs, $class );
 	}
 
 	$img_data = wp_get_attachment_image_src( $id, $args['size'] );
@@ -279,14 +279,14 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
 				'height' => $height,
 			)
 		);
-		$attrs = webp_ac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
+		$attrs = saswac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
 
-		return webp_ac_build_img_tag( $attrs, $class );
+		return saswac_build_img_tag( $attrs, $class );
 	}
 
 	$webp_srcset = '';
-	if ( webp_ac_get_webp_url( $url ) ) {
-		$webp_srcset = webp_ac_srcset_to_webp( $srcset );
+	if ( saswac_get_webp_url( $url ) ) {
+		$webp_srcset = saswac_srcset_to_webp( $srcset );
 	}
 
 	if ( '' !== $webp_srcset ) {
@@ -303,9 +303,9 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
 				'height' => $height,
 			)
 		);
-		$attrs = webp_ac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
+		$attrs = saswac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
 
-		$html .= webp_ac_build_img_tag( $attrs, $class );
+		$html .= saswac_build_img_tag( $attrs, $class );
 		$html .= '</picture>';
 
 		return $html;
@@ -321,9 +321,9 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
 			'height' => $height,
 		)
 	);
-	$attrs = webp_ac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
+	$attrs = saswac_apply_image_a11y_attrs( $attrs, $alt, $decorative );
 
-	return webp_ac_build_img_tag( $attrs, $class );
+	return saswac_build_img_tag( $attrs, $class );
 }
 
 /**
@@ -334,8 +334,8 @@ function webp_ac_get_image_html( $img, array $args = array() ): string {
  * @param string $class          CSS class.
  * @param string $size           Registered image size. Default 'thumbnail'.
  */
-function webp_ac_icon_html( $image, string $context_label = '', string $class = '', string $size = 'thumbnail' ): string {
-	$image = webp_ac_normalize_image( $image );
+function saswac_icon_html( $image, string $context_label = '', string $class = '', string $size = 'thumbnail' ): string {
+	$image = saswac_normalize_image( $image );
 	if ( ! $image ) {
 		return '';
 	}
@@ -345,7 +345,7 @@ function webp_ac_icon_html( $image, string $context_label = '', string $class = 
 	}
 	$image['decorative'] = true;
 
-	return webp_ac_get_image_html(
+	return saswac_get_image_html(
 		$image,
 		array(
 			'class'      => $class,
@@ -364,13 +364,13 @@ function webp_ac_icon_html( $image, string $context_label = '', string $class = 
  * @param string $class  CSS class.
  * @param string $size   Registered image size. Default 'full'.
  */
-function webp_ac_hero_image_html( $img, bool $is_lcp = true, string $class = 'hero__bg', string $size = 'full' ): string {
-	$img = webp_ac_normalize_image( $img );
+function saswac_hero_image_html( $img, bool $is_lcp = true, string $class = 'hero__bg', string $size = 'full' ): string {
+	$img = saswac_normalize_image( $img );
 	if ( ! $img ) {
 		return '';
 	}
 
-	return webp_ac_get_image_html(
+	return saswac_get_image_html(
 		$img,
 		array(
 			'class'   => $class,
@@ -388,15 +388,15 @@ function webp_ac_hero_image_html( $img, bool $is_lcp = true, string $class = 'he
  * Accepts attachment ID, media URL, or array with `ID` / `id` (e.g. from custom fields).
  *
  * @param mixed              $image   Attachment ID, URL, or image array.
- * @param array<string,mixed> $options Same keys as webp_ac_get_image_html() args.
+ * @param array<string,mixed> $options Same keys as saswac_get_image_html() args.
  */
-function webp_ac_attachment_image_html( $image, array $options = array() ): string {
-	$image = webp_ac_normalize_image( $image );
+function saswac_attachment_image_html( $image, array $options = array() ): string {
+	$image = saswac_normalize_image( $image );
 	if ( ! $image ) {
 		return '';
 	}
 
-	$html = webp_ac_get_image_html( $image, $options );
+	$html = saswac_get_image_html( $image, $options );
 	if ( '' !== $html ) {
 		return $html;
 	}
@@ -415,9 +415,9 @@ function webp_ac_attachment_image_html( $image, array $options = array() ): stri
  * Featured image markup for a post (no ACF required).
  *
  * @param int|WP_Post|null      $post Post object, ID, or null for current post.
- * @param array<string,mixed>   $args Same keys as webp_ac_get_image_html() args.
+ * @param array<string,mixed>   $args Same keys as saswac_get_image_html() args.
  */
-function webp_ac_get_the_post_thumbnail_html( $post = null, array $args = array() ): string {
+function saswac_get_the_post_thumbnail_html( $post = null, array $args = array() ): string {
 	$post = get_post( $post );
 	if ( ! $post ) {
 		return '';
@@ -433,16 +433,16 @@ function webp_ac_get_the_post_thumbnail_html( $post = null, array $args = array(
 	);
 	$args = array_merge( $defaults, $args );
 
-	return webp_ac_get_image_html( $thumbnail_id, $args );
+	return saswac_get_image_html( $thumbnail_id, $args );
 }
 
 /**
  * Echo featured image markup.
  *
- * @param string|array<string,mixed> $size Image size name or webp_ac_get_image_html() args when array.
+ * @param string|array<string,mixed> $size Image size name or saswac_get_image_html() args when array.
  * @param array<string,mixed>        $args Extra args when $size is a string.
  */
-function webp_ac_the_post_thumbnail( $size = 'post-thumbnail', array $args = array() ): void {
+function saswac_the_post_thumbnail( $size = 'post-thumbnail', array $args = array() ): void {
 	if ( is_array( $size ) ) {
 		$args = $size;
 		$size = $args['size'] ?? 'post-thumbnail';
@@ -452,7 +452,7 @@ function webp_ac_the_post_thumbnail( $size = 'post-thumbnail', array $args = arr
 	$args['size'] = (string) $size;
 
 	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in builder.
-	echo webp_ac_get_the_post_thumbnail_html( null, $args );
+	echo saswac_get_the_post_thumbnail_html( null, $args );
 }
 
 /**
@@ -460,41 +460,41 @@ function webp_ac_the_post_thumbnail( $size = 'post-thumbnail', array $args = arr
  *
  * @param int|WP_Post|null    $post     Post object, ID, or null for current post.
  * @param string              $meta_key Post meta key.
- * @param array<string,mixed> $args     Same keys as webp_ac_get_image_html() args.
+ * @param array<string,mixed> $args     Same keys as saswac_get_image_html() args.
  */
-function webp_ac_get_image_from_post_meta( $post, string $meta_key, array $args = array() ): string {
+function saswac_get_image_from_post_meta( $post, string $meta_key, array $args = array() ): string {
 	$post = get_post( $post );
 	if ( ! $post || '' === $meta_key ) {
 		return '';
 	}
 
 	$value = get_post_meta( $post->ID, $meta_key, true );
-	$image = webp_ac_normalize_image( $value );
+	$image = saswac_normalize_image( $value );
 	if ( ! $image ) {
 		return '';
 	}
 
-	return webp_ac_get_image_html( $image, $args );
+	return saswac_get_image_html( $image, $args );
 }
 
 /**
  * Image from a site option (attachment ID or media URL).
  *
  * @param string              $option_name Option name.
- * @param array<string,mixed> $args        Same keys as webp_ac_get_image_html() args.
+ * @param array<string,mixed> $args        Same keys as saswac_get_image_html() args.
  */
-function webp_ac_get_image_from_option( string $option_name, array $args = array() ): string {
+function saswac_get_image_from_option( string $option_name, array $args = array() ): string {
 	if ( '' === $option_name ) {
 		return '';
 	}
 
 	$value = get_option( $option_name, null );
-	$image = webp_ac_normalize_image( $value );
+	$image = saswac_normalize_image( $value );
 	if ( ! $image ) {
 		return '';
 	}
 
-	return webp_ac_get_image_html( $image, $args );
+	return saswac_get_image_html( $image, $args );
 }
 
 /**
@@ -502,9 +502,9 @@ function webp_ac_get_image_from_option( string $option_name, array $args = array
  *
  * @param int|string          $attachment_id Attachment ID.
  * @param string|int[]        $size          Registered size name or [width, height].
- * @param array<string,mixed> $args          Same keys as webp_ac_get_image_html() args.
+ * @param array<string,mixed> $args          Same keys as saswac_get_image_html() args.
  */
-function webp_ac_wp_attachment_image( $attachment_id, $size = 'thumbnail', array $args = array() ): string {
+function saswac_wp_attachment_image( $attachment_id, $size = 'thumbnail', array $args = array() ): string {
 	$attachment_id = (int) $attachment_id;
 	if ( $attachment_id <= 0 ) {
 		return '';
@@ -516,7 +516,7 @@ function webp_ac_wp_attachment_image( $attachment_id, $size = 'thumbnail', array
 		$args['size'] = (string) $size;
 	}
 
-	$html = webp_ac_get_image_html( $attachment_id, $args );
+	$html = saswac_get_image_html( $attachment_id, $args );
 	if ( '' !== $html ) {
 		return $html;
 	}
@@ -536,13 +536,13 @@ function webp_ac_wp_attachment_image( $attachment_id, $size = 'thumbnail', array
  * @param int|WP_Post|null    $post Post object, ID, or null for current post.
  * @param array<string,mixed> $args Replacement options.
  */
-function webp_ac_get_the_content_images_html( $post = null, array $args = array() ): string {
+function saswac_get_the_content_images_html( $post = null, array $args = array() ): string {
 	$post = get_post( $post );
 	if ( ! $post ) {
 		return '';
 	}
 
-	return webp_ac_replace_content_images( $post->post_content, $args );
+	return saswac_replace_content_images( $post->post_content, $args );
 }
 
 /**
@@ -551,7 +551,7 @@ function webp_ac_get_the_content_images_html( $post = null, array $args = array(
  * @param string              $content Post content HTML.
  * @param array<string,mixed> $args    Optional size, sizes, loading for replacements.
  */
-function webp_ac_replace_content_images( string $content, array $args = array() ): string {
+function saswac_replace_content_images( string $content, array $args = array() ): string {
 	if ( '' === $content || false === stripos( $content, '<img' ) ) {
 		return $content;
 	}
@@ -580,7 +580,7 @@ function webp_ac_replace_content_images( string $content, array $args = array() 
 				$alt = $alt_match[1];
 			}
 
-			$replacement = webp_ac_get_image_html(
+			$replacement = saswac_get_image_html(
 				array(
 					'ID'    => $img_id,
 					'alt'   => is_string( $alt ) ? $alt : '',
@@ -606,7 +606,7 @@ function webp_ac_replace_content_images( string $content, array $args = array() 
  * @param mixed              $content        HTML content.
  * @param array<string,mixed> $image_options Replacement options.
  */
-function webp_ac_render_rich_content( $content, array $image_options = array() ): string {
+function saswac_render_rich_content( $content, array $image_options = array() ): string {
 	if ( null === $content || '' === $content || is_array( $content ) ) {
 		return '';
 	}
@@ -617,5 +617,5 @@ function webp_ac_render_rich_content( $content, array $image_options = array() )
 		return $html;
 	}
 
-	return webp_ac_replace_content_images( $html, $image_options );
+	return saswac_replace_content_images( $html, $image_options );
 }

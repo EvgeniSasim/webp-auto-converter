@@ -1,13 +1,13 @@
 (function () {
 	'use strict';
 
-	const config = window.webpAcAdmin;
+	const config = window.saswacAdmin;
 	if (!config) {
 		return;
 	}
 
-	const range = document.getElementById('webp-ac-quality-range');
-	const number = document.getElementById('webp-ac-quality-number');
+	const range = document.getElementById('saswac-quality-range');
+	const number = document.getElementById('saswac-quality-number');
 
 	if (range && number) {
 		const clamp = (value) => Math.max(0, Math.min(100, value));
@@ -29,10 +29,10 @@
 		});
 	}
 
-	const btn = document.getElementById('webp-ac-batch-start');
-	const progress = document.getElementById('webp-ac-batch-progress');
-	const progressBar = document.getElementById('webp-ac-batch-progress-bar');
-	const status = document.getElementById('webp-ac-batch-status');
+	const btn = document.getElementById('saswac-batch-start');
+	const progress = document.getElementById('saswac-batch-progress');
+	const progressBar = document.getElementById('saswac-batch-progress-bar');
+	const status = document.getElementById('saswac-batch-status');
 
 	if (!btn || !progress || !progressBar || !status) {
 		return;
@@ -42,7 +42,7 @@
 
 	const setProgress = (percent, indeterminate) => {
 		progress.hidden = false;
-		progress.classList.toggle('webp-ac-progress--indeterminate', indeterminate);
+		progress.classList.toggle('saswac-progress--indeterminate', indeterminate);
 
 		if (indeterminate) {
 			progress.removeAttribute('aria-valuenow');
@@ -91,7 +91,7 @@
 		try {
 			while (true) {
 				const body = new URLSearchParams();
-				body.set('action', 'webp_auto_converter_batch');
+				body.set('action', 'saswac_batch');
 				body.set('offset', String(offset));
 				body.set('_ajax_nonce', config.nonce);
 

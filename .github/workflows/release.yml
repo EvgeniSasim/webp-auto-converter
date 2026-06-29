@@ -17,8 +17,8 @@ jobs:
       - name: Verify tag matches plugin version
         run: |
           TAG="${GITHUB_REF_NAME#v}"
-          PHP_VERSION=$(grep 'Version:' privaro-webp-auto-converter/privaro-webp-auto-converter.php | awk '{print $NF}')
-          README_TAG=$(grep 'Stable tag:' privaro-webp-auto-converter/readme.txt | awk '{print $NF}')
+          PHP_VERSION=$(grep 'Version:' sasim-webp-auto-converter/sasim-webp-auto-converter.php | awk '{print $NF}')
+          README_TAG=$(grep 'Stable tag:' sasim-webp-auto-converter/readme.txt | awk '{print $NF}')
           echo "Tag: ${TAG}, PHP: ${PHP_VERSION}, readme: ${README_TAG}"
           test "${TAG}" = "${PHP_VERSION}"
           test "${TAG}" = "${README_TAG}"
@@ -42,6 +42,6 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/privaro-webp-auto-converter.zip
+          files: build/sasim-webp-auto-converter.zip
           body_path: release-notes.md
           generate_release_notes: false
