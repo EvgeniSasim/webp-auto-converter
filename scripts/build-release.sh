@@ -3,8 +3,8 @@
 
 set -e
 
-PLUGIN_SLUG="privaro-webp-auto-converter"
-PLUGIN_DIR="privaro-webp-auto-converter"
+PLUGIN_SLUG="sasim-webp-auto-converter"
+PLUGIN_DIR="sasim-webp-auto-converter"
 BUILD_DIR="build"
 
 echo "Verifying versions..."

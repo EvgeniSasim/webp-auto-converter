@@ -1,10 +1,10 @@
-=== Privaro WebP Auto Converter ===
+=== Sasim WebP Auto Converter ===
 Contributors: evgenij347
 Tags: webp, images, performance, media, optimization
 Requires at least: 5.8
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Automatically convert uploaded JPEG and PNG images to WebP and serve them on the
 
 == Description ==
 
-**Privaro WebP Auto Converter** creates WebP copies of your JPEG and PNG uploads and **automatically outputs them on the front end** — no theme code required.
+**Sasim WebP Auto Converter** creates WebP copies of your JPEG and PNG uploads and **automatically outputs them on the front end** — no theme code required.
 
 = Plug & play (enabled by default) =
 
@@ -45,7 +45,7 @@ This plugin processes images **only on your server**. It does not collect, store
 = From WordPress.org (after approval) =
 
 1. Go to **Plugins → Add New**.
-2. Search for **Privaro WebP Auto Converter**.
+2. Search for **Sasim WebP Auto Converter**.
 3. Click **Install Now**, then **Activate**.
 
 = Manual upload =
@@ -114,7 +114,9 @@ This plugin **does not** connect to third-party services. Image conversion uses 
 
 == Changelog ==
 
-= 1.4.0 =
+= 1.4.1 =
+* Renamed to Sasim WebP Auto Converter (`sasim-webp-auto-converter` slug)
+* Prefixed functions, options, AJAX actions, and admin script handles (`saswac_*`)
 * Redesigned settings page: status strip, postbox sections, batch progress bar
 * Quality slider with synced number input
 * For developers section with theme helpers documentation link
@@ -123,13 +125,13 @@ This plugin **does not** connect to third-party services. Image conversion uses 
 = 1.3.0 =
 * Plug & play mode: auto-enhance featured images, attachment images, and content (on by default)
 * Settings toggle to disable front-end auto output
-* Developer filters: `webp_ac_auto_output_enabled`, `webp_ac_should_auto_output`, `webp_ac_default_sizes_attr`
+* Developer filters: `saswac_auto_output_enabled`, `saswac_should_auto_output`, `saswac_default_sizes_attr`
 
 = 1.2.1 =
 * WordPress-native helpers without ACF: featured image, post meta, options, wp_attachment_image drop-in
 
 = 1.2.0 =
-* Theme helper functions for responsive `<picture>` WebP output (`webp_ac_*`)
+* Theme helper functions for responsive `<picture>` WebP output (`saswac_*`)
 * Optional `the_content` filter (disabled by default)
 * Documentation: docs/theme-helpers.md
 
@@ -144,7 +146,7 @@ This plugin **does not** connect to third-party services. Image conversion uses 
 
 == Upgrade Notice ==
 
-= 1.4.0 =
+= 1.4.1 =
 Improved admin UI with progress feedback for batch conversion and clearer plugin status.
 
 = 1.1.0 =

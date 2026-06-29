@@ -1,62 +1,62 @@
 <?php
 /**
- * Plugin Name:       Privaro WebP Auto Converter
+ * Plugin Name:       Sasim WebP Auto Converter
  * Plugin URI:        https://github.com/EvgeniSasim/webp-auto-converter
  * Description:       Converts uploaded JPEG and PNG images to WebP and automatically serves them on the front end (plug & play).
- * Version:           1.4.0
+ * Version:           1.4.1
  * Requires at least: 5.8
  * Requires PHP:      7.4
  * Author:            Evgenii Sasim
  * Author URI:        https://www.instagram.com/evgenii.sasim/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       privaro-webp-auto-converter
+ * Text Domain:       sasim-webp-auto-converter
  *
- * @package WebP_Auto_Converter
+ * @package Sasim_WebP_Auto_Converter
  */
 
 defined( 'ABSPATH' ) || exit;
 
-const WEBP_AUTO_CONVERTER_VERSION      = '1.4.0';
-const WEBP_AUTO_CONVERTER_OPTION       = 'webp_auto_converter_quality';
-const WEBP_AUTO_CONVERTER_AUTO_OUTPUT  = 'webp_auto_converter_auto_output';
-const WEBP_AUTO_CONVERTER_BATCH        = 25;
+const SASWAC_VERSION      = '1.4.1';
+const SASWAC_OPTION       = 'saswac_quality';
+const SASWAC_AUTO_OUTPUT  = 'saswac_auto_output';
+const SASWAC_BATCH        = 25;
 
-register_activation_hook( __FILE__, 'webp_auto_converter_activate' );
+register_activation_hook( __FILE__, 'saswac_activate' );
 
 /**
  * Set default options on activation.
  */
-function webp_auto_converter_activate(): void {
-	add_option( WEBP_AUTO_CONVERTER_OPTION, 82 );
-	add_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, 1 );
+function saswac_activate(): void {
+	add_option( SASWAC_OPTION, 82 );
+	add_option( SASWAC_AUTO_OUTPUT, 1 );
 }
 
 // --- Settings ---
-add_action( 'admin_menu', 'webp_auto_converter_menu' );
-add_action( 'admin_init', 'webp_auto_converter_settings' );
-add_action( 'admin_enqueue_scripts', 'webp_auto_converter_admin_assets' );
+add_action( 'admin_menu', 'saswac_menu' );
+add_action( 'admin_init', 'saswac_settings' );
+add_action( 'admin_enqueue_scripts', 'saswac_admin_assets' );
 
 /**
  * Register settings page under Settings.
  */
-function webp_auto_converter_menu(): void {
+function saswac_menu(): void {
 	add_options_page(
-		__( 'WebP Converter', 'privaro-webp-auto-converter' ),
-		__( 'WebP Converter', 'privaro-webp-auto-converter' ),
+		__( 'WebP Converter', 'sasim-webp-auto-converter' ),
+		__( 'WebP Converter', 'sasim-webp-auto-converter' ),
 		'manage_options',
-		'privaro-webp-auto-converter',
-		'webp_auto_converter_settings_page'
+		'sasim-webp-auto-converter',
+		'saswac_settings_page'
 	);
 }
 
 /**
  * Register plugin settings.
  */
-function webp_auto_converter_settings(): void {
+function saswac_settings(): void {
 	register_setting(
-		'webp_auto_converter_options',
-		WEBP_AUTO_CONVERTER_OPTION,
+		'saswac_options',
+		SASWAC_OPTION,
 		array(
 			'type'              => 'integer',
 			'default'           => 82,
@@ -67,8 +67,8 @@ function webp_auto_converter_settings(): void {
 	);
 
 	register_setting(
-		'webp_auto_converter_options',
-		WEBP_AUTO_CONVERTER_AUTO_OUTPUT,
+		'saswac_options',
+		SASWAC_AUTO_OUTPUT,
 		array(
 			'type'              => 'boolean',
 			'default'           => true,
@@ -79,74 +79,74 @@ function webp_auto_converter_settings(): void {
 	);
 
 	add_settings_section(
-		'webp_auto_converter_main',
+		'saswac_main',
 		'',
 		null,
-		'privaro-webp-auto-converter'
+		'sasim-webp-auto-converter'
 	);
 
 	add_settings_field(
-		WEBP_AUTO_CONVERTER_AUTO_OUTPUT,
-		__( 'Plug & play front-end output', 'privaro-webp-auto-converter' ),
-		'webp_auto_converter_auto_output_field',
-		'privaro-webp-auto-converter',
-		'webp_auto_converter_main'
+		SASWAC_AUTO_OUTPUT,
+		__( 'Plug & play front-end output', 'sasim-webp-auto-converter' ),
+		'saswac_auto_output_field',
+		'sasim-webp-auto-converter',
+		'saswac_main'
 	);
 
 	add_settings_field(
-		WEBP_AUTO_CONVERTER_OPTION,
-		__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ),
-		'webp_auto_converter_quality_field',
-		'privaro-webp-auto-converter',
-		'webp_auto_converter_main'
+		SASWAC_OPTION,
+		__( 'WebP quality (0–100)', 'sasim-webp-auto-converter' ),
+		'saswac_quality_field',
+		'sasim-webp-auto-converter',
+		'saswac_main'
 	);
 }
 
 /**
  * Render plug-and-play setting field.
  */
-function webp_auto_converter_auto_output_field(): void {
-	$value = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
-	echo '<input type="hidden" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="0">';
+function saswac_auto_output_field(): void {
+	$value = (bool) get_option( SASWAC_AUTO_OUTPUT, true );
+	echo '<input type="hidden" name="' . esc_attr( SASWAC_AUTO_OUTPUT ) . '" value="0">';
 	echo '<label>';
-	echo '<input type="checkbox" name="' . esc_attr( WEBP_AUTO_CONVERTER_AUTO_OUTPUT ) . '" value="1" ' . checked( $value, true, false ) . '>';
-	echo ' ' . esc_html__( 'Automatically output WebP in themes (no code required)', 'privaro-webp-auto-converter' );
+	echo '<input type="checkbox" name="' . esc_attr( SASWAC_AUTO_OUTPUT ) . '" value="1" ' . checked( $value, true, false ) . '>';
+	echo ' ' . esc_html__( 'Automatically output WebP in themes (no code required)', 'sasim-webp-auto-converter' );
 	echo '</label>';
-	echo '<p class="description">' . esc_html__( 'Enhances featured images, attachment images, and post/widget content with responsive <picture> markup when WebP files exist.', 'privaro-webp-auto-converter' ) . '</p>';
+	echo '<p class="description">' . esc_html__( 'Enhances featured images, attachment images, and post/widget content with responsive <picture> markup when WebP files exist.', 'sasim-webp-auto-converter' ) . '</p>';
 }
 
 /**
  * Render quality field.
  */
-function webp_auto_converter_quality_field(): void {
-	$value = (int) get_option( WEBP_AUTO_CONVERTER_OPTION, 82 );
+function saswac_quality_field(): void {
+	$value = (int) get_option( SASWAC_OPTION, 82 );
 	?>
-	<div class="webp-ac-quality">
+	<div class="saswac-quality">
 		<input
 			type="range"
-			id="webp-ac-quality-range"
-			class="webp-ac-quality__range"
+			id="saswac-quality-range"
+			class="saswac-quality__range"
 			min="0"
 			max="100"
 			value="<?php echo esc_attr( (string) $value ); ?>"
-			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ); ?>"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'sasim-webp-auto-converter' ); ?>"
 		>
 		<input
 			type="number"
-			id="webp-ac-quality-number"
-			class="small-text webp-ac-quality__number"
-			name="<?php echo esc_attr( WEBP_AUTO_CONVERTER_OPTION ); ?>"
+			id="saswac-quality-number"
+			class="small-text saswac-quality__number"
+			name="<?php echo esc_attr( SASWAC_OPTION ); ?>"
 			value="<?php echo esc_attr( (string) $value ); ?>"
 			min="0"
 			max="100"
-			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'privaro-webp-auto-converter' ); ?>"
+			aria-label="<?php echo esc_attr__( 'WebP quality (0–100)', 'sasim-webp-auto-converter' ); ?>"
 		>
 	</div>
 	<p class="description">
-		<?php echo esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'privaro-webp-auto-converter' ); ?>
+		<?php echo esc_html__( 'Lower values produce smaller files. 80–85 is a good balance for photos.', 'sasim-webp-auto-converter' ); ?>
 	</p>
 	<p class="description">
-		<?php echo esc_html__( 'Applies to new conversions. Re-run batch below to regenerate existing media.', 'privaro-webp-auto-converter' ); ?>
+		<?php echo esc_html__( 'Applies to new conversions. Re-run batch below to regenerate existing media.', 'sasim-webp-auto-converter' ); ?>
 	</p>
 	<?php
 }
@@ -156,8 +156,8 @@ function webp_auto_converter_quality_field(): void {
  *
  * @return string|null "imagick", "gd", or null when unavailable.
  */
-function webp_auto_converter_get_converter_backend(): ?string {
-	if ( ! webp_auto_converter_gd_or_imagick_available() ) {
+function saswac_get_converter_backend(): ?string {
+	if ( ! saswac_gd_or_imagick_available() ) {
 		return null;
 	}
 
@@ -175,7 +175,7 @@ function webp_auto_converter_get_converter_backend(): ?string {
 /**
  * Count JPEG/PNG attachments in the media library.
  */
-function webp_auto_converter_count_convertible_attachments(): int {
+function saswac_count_convertible_attachments(): int {
 	$query = new WP_Query(
 		array(
 			'post_type'      => 'attachment',
@@ -193,14 +193,14 @@ function webp_auto_converter_count_convertible_attachments(): int {
 /**
  * Theme helpers documentation URL.
  */
-function webp_auto_converter_docs_url(): string {
+function saswac_docs_url(): string {
 	/**
 	 * Filters the theme helpers documentation URL shown in admin.
 	 *
 	 * @param string $url Documentation URL.
 	 */
 	return (string) apply_filters(
-		'webp_ac_docs_url',
+		'saswac_docs_url',
 		'https://github.com/EvgeniSasim/webp-auto-converter/blob/main/docs/theme-helpers.md'
 	);
 }
@@ -210,42 +210,42 @@ function webp_auto_converter_docs_url(): string {
  *
  * @param string $hook_suffix Current admin page hook suffix.
  */
-function webp_auto_converter_admin_assets( string $hook_suffix ): void {
-	if ( 'settings_page_webp-auto-converter' !== $hook_suffix ) {
+function saswac_admin_assets( string $hook_suffix ): void {
+	if ( 'settings_page_sasim-webp-auto-converter' !== $hook_suffix ) {
 		return;
 	}
 
 	wp_enqueue_style(
-		'webp-ac-admin',
+		'saswac-admin',
 		plugins_url( 'assets/admin.css', __FILE__ ),
 		array(),
-		WEBP_AUTO_CONVERTER_VERSION
+		SASWAC_VERSION
 	);
 
 	wp_enqueue_script(
-		'webp-ac-admin',
+		'saswac-admin',
 		plugins_url( 'assets/admin.js', __FILE__ ),
 		array(),
-		WEBP_AUTO_CONVERTER_VERSION,
+		SASWAC_VERSION,
 		true
 	);
 
 	wp_localize_script(
-		'webp-ac-admin',
-		'webpAcAdmin',
+		'saswac-admin',
+		'saswacAdmin',
 		array(
 			'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
-			'nonce'              => wp_create_nonce( 'webp_auto_converter_batch' ),
-			'converterAvailable' => webp_auto_converter_gd_or_imagick_available(),
+			'nonce'              => wp_create_nonce( 'saswac_batch' ),
+			'converterAvailable' => saswac_gd_or_imagick_available(),
 			'i18n'               => array(
-				'start'        => __( 'Generate WebP', 'privaro-webp-auto-converter' ),
-				'running'      => __( 'Converting…', 'privaro-webp-auto-converter' ),
-				'starting'     => __( 'Starting…', 'privaro-webp-auto-converter' ),
-				'error'        => __( 'Error', 'privaro-webp-auto-converter' ),
-				'networkError' => __( 'Network error. Check your connection and try again.', 'privaro-webp-auto-converter' ),
-				'noImages'     => __( 'No JPEG or PNG images found in the media library.', 'privaro-webp-auto-converter' ),
-				'progress'     => __( 'Processed %1$s of %2$s attachments · %3$s WebP files created', 'privaro-webp-auto-converter' ),
-				'done'         => __( 'All done. %1$s WebP files created across %2$s attachments.', 'privaro-webp-auto-converter' ),
+				'start'        => __( 'Generate WebP', 'sasim-webp-auto-converter' ),
+				'running'      => __( 'Converting…', 'sasim-webp-auto-converter' ),
+				'starting'     => __( 'Starting…', 'sasim-webp-auto-converter' ),
+				'error'        => __( 'Error', 'sasim-webp-auto-converter' ),
+				'networkError' => __( 'Network error. Check your connection and try again.', 'sasim-webp-auto-converter' ),
+				'noImages'     => __( 'No JPEG or PNG images found in the media library.', 'sasim-webp-auto-converter' ),
+				'progress'     => __( 'Processed %1$s of %2$s attachments · %3$s WebP files created', 'sasim-webp-auto-converter' ),
+				'done'         => __( 'All done. %1$s WebP files created across %2$s attachments.', 'sasim-webp-auto-converter' ),
 			),
 		)
 	);
@@ -254,36 +254,36 @@ function webp_auto_converter_admin_assets( string $hook_suffix ): void {
 /**
  * Render the read-only status strip.
  */
-function webp_auto_converter_render_status_strip(): void {
-	$backend      = webp_auto_converter_get_converter_backend();
-	$auto_output  = (bool) get_option( WEBP_AUTO_CONVERTER_AUTO_OUTPUT, true );
+function saswac_render_status_strip(): void {
+	$backend      = saswac_get_converter_backend();
+	$auto_output  = (bool) get_option( SASWAC_AUTO_OUTPUT, true );
 	$converter_ok = null !== $backend;
 	?>
-	<div class="webp-ac-status" role="region" aria-label="<?php echo esc_attr__( 'Plugin status', 'privaro-webp-auto-converter' ); ?>">
-		<p class="webp-ac-status__item">
-			<span class="webp-ac-status__dot<?php echo esc_attr( $converter_ok ? ' webp-ac-status__dot--ok' : '' ); ?>" aria-hidden="true"></span>
+	<div class="saswac-status" role="region" aria-label="<?php echo esc_attr__( 'Plugin status', 'sasim-webp-auto-converter' ); ?>">
+		<p class="saswac-status__item">
+			<span class="saswac-status__dot<?php echo esc_attr( $converter_ok ? ' saswac-status__dot--ok' : '' ); ?>" aria-hidden="true"></span>
 			<?php
 			if ( 'imagick' === $backend ) {
-				echo esc_html__( 'Converter ready (Imagick)', 'privaro-webp-auto-converter' );
+				echo esc_html__( 'Converter ready (Imagick)', 'sasim-webp-auto-converter' );
 			} elseif ( 'gd' === $backend ) {
-				echo esc_html__( 'Converter ready (GD)', 'privaro-webp-auto-converter' );
+				echo esc_html__( 'Converter ready (GD)', 'sasim-webp-auto-converter' );
 			} else {
-				echo esc_html__( 'Converter unavailable', 'privaro-webp-auto-converter' );
+				echo esc_html__( 'Converter unavailable', 'sasim-webp-auto-converter' );
 			}
 			?>
 		</p>
-		<p class="webp-ac-status__item">
-			<span class="webp-ac-status__dot<?php echo esc_attr( $auto_output ? ' webp-ac-status__dot--ok' : ' webp-ac-status__dot--off' ); ?>" aria-hidden="true"></span>
+		<p class="saswac-status__item">
+			<span class="saswac-status__dot<?php echo esc_attr( $auto_output ? ' saswac-status__dot--ok' : ' saswac-status__dot--off' ); ?>" aria-hidden="true"></span>
 			<?php
 			echo $auto_output
-				? esc_html__( 'Plug & play: On', 'privaro-webp-auto-converter' )
-				: esc_html__( 'Plug & play: Off', 'privaro-webp-auto-converter' );
+				? esc_html__( 'Plug & play: On', 'sasim-webp-auto-converter' )
+				: esc_html__( 'Plug & play: Off', 'sasim-webp-auto-converter' );
 			?>
 		</p>
 		<?php if ( $converter_ok ) : ?>
-			<p class="webp-ac-status__item">
-				<span class="webp-ac-status__dot webp-ac-status__dot--ok" aria-hidden="true"></span>
-				<?php echo esc_html__( 'New uploads: WebP generated automatically', 'privaro-webp-auto-converter' ); ?>
+			<p class="saswac-status__item">
+				<span class="saswac-status__dot saswac-status__dot--ok" aria-hidden="true"></span>
+				<?php echo esc_html__( 'New uploads: WebP generated automatically', 'sasim-webp-auto-converter' ); ?>
 			</p>
 		<?php endif; ?>
 	</div>
@@ -293,15 +293,15 @@ function webp_auto_converter_render_status_strip(): void {
 /**
  * Render settings page.
  */
-function webp_auto_converter_settings_page(): void {
+function saswac_settings_page(): void {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
-	$converter_ok = webp_auto_converter_gd_or_imagick_available();
+	$converter_ok = saswac_gd_or_imagick_available();
 	?>
-	<div class="wrap" id="webp-ac-settings">
-		<h1><?php echo esc_html__( 'WebP Converter', 'privaro-webp-auto-converter' ); ?></h1>
+	<div class="wrap" id="saswac-settings">
+		<h1><?php echo esc_html__( 'WebP Converter', 'sasim-webp-auto-converter' ); ?></h1>
 
 		<?php if ( ! $converter_ok ) : ?>
 			<div class="notice notice-warning">
@@ -309,80 +309,80 @@ function webp_auto_converter_settings_page(): void {
 					<?php
 					echo esc_html__(
 						'WebP conversion is unavailable on this server. Enable GD with imagewebp support or Imagick with WebP support, then refresh this page.',
-						'privaro-webp-auto-converter'
+						'sasim-webp-auto-converter'
 					);
 					?>
 				</p>
 			</div>
 		<?php endif; ?>
 
-		<?php webp_auto_converter_render_status_strip(); ?>
+		<?php saswac_render_status_strip(); ?>
 
-		<div class="postbox webp-ac-postbox">
+		<div class="postbox saswac-postbox">
 			<div class="postbox-header">
-				<h2 class="hndle"><?php echo esc_html__( 'Conversion settings', 'privaro-webp-auto-converter' ); ?></h2>
+				<h2 class="hndle"><?php echo esc_html__( 'Conversion settings', 'sasim-webp-auto-converter' ); ?></h2>
 			</div>
 			<div class="inside">
 				<form method="post" action="options.php">
 					<?php
-					settings_fields( 'webp_auto_converter_options' );
-					do_settings_sections( 'privaro-webp-auto-converter' );
+					settings_fields( 'saswac_options' );
+					do_settings_sections( 'sasim-webp-auto-converter' );
 					submit_button();
 					?>
 				</form>
 			</div>
 		</div>
 
-		<div class="postbox webp-ac-postbox">
+		<div class="postbox saswac-postbox">
 			<div class="postbox-header">
-				<h2 class="hndle"><?php echo esc_html__( 'Existing media', 'privaro-webp-auto-converter' ); ?></h2>
+				<h2 class="hndle"><?php echo esc_html__( 'Existing media', 'sasim-webp-auto-converter' ); ?></h2>
 			</div>
 			<div class="inside">
-				<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'privaro-webp-auto-converter' ); ?></p>
+				<p><?php echo esc_html__( 'Generate WebP for images that were uploaded before this plugin was active.', 'sasim-webp-auto-converter' ); ?></p>
 				<p>
 					<button
 						type="button"
 						class="button button-primary"
-						id="webp-ac-batch-start"
+						id="saswac-batch-start"
 						<?php disabled( ! $converter_ok ); ?>
 					>
-						<?php echo esc_html__( 'Generate WebP', 'privaro-webp-auto-converter' ); ?>
+						<?php echo esc_html__( 'Generate WebP', 'sasim-webp-auto-converter' ); ?>
 					</button>
 				</p>
 				<div
-					id="webp-ac-batch-progress"
-					class="webp-ac-progress"
+					id="saswac-batch-progress"
+					class="saswac-progress"
 					role="progressbar"
 					aria-valuemin="0"
 					aria-valuemax="100"
 					aria-valuenow="0"
 					hidden
 				>
-					<div id="webp-ac-batch-progress-bar" class="webp-ac-progress__bar"></div>
+					<div id="saswac-batch-progress-bar" class="saswac-progress__bar"></div>
 				</div>
-				<p id="webp-ac-batch-status" class="webp-ac-batch-status" aria-live="polite" aria-atomic="true"></p>
+				<p id="saswac-batch-status" class="saswac-batch-status" aria-live="polite" aria-atomic="true"></p>
 			</div>
 		</div>
 
-		<details class="postbox webp-ac-postbox webp-ac-dev">
-			<summary><?php echo esc_html__( 'For developers', 'privaro-webp-auto-converter' ); ?></summary>
-			<div class="webp-ac-dev__body">
+		<details class="postbox saswac-postbox saswac-dev">
+			<summary><?php echo esc_html__( 'For developers', 'sasim-webp-auto-converter' ); ?></summary>
+			<div class="saswac-dev__body">
 				<p>
 					<?php
 					echo esc_html__(
 						'Plug & play covers most themes. For custom templates, use the theme helper functions in your PHP templates.',
-						'privaro-webp-auto-converter'
+						'sasim-webp-auto-converter'
 					);
 					?>
 				</p>
 				<p>
-					<a href="<?php echo esc_url( webp_auto_converter_docs_url() ); ?>" target="_blank" rel="noopener noreferrer">
-						<?php echo esc_html__( 'View theme helpers documentation', 'privaro-webp-auto-converter' ); ?>
-						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'privaro-webp-auto-converter' ); ?></span>
+					<a href="<?php echo esc_url( saswac_docs_url() ); ?>" target="_blank" rel="noopener noreferrer">
+						<?php echo esc_html__( 'View theme helpers documentation', 'sasim-webp-auto-converter' ); ?>
+						<span class="screen-reader-text"><?php echo esc_html__( '(opens in a new tab)', 'sasim-webp-auto-converter' ); ?></span>
 					</a>
 				</p>
-				<p><?php echo esc_html__( 'Disable auto output in code:', 'privaro-webp-auto-converter' ); ?></p>
-				<code class="webp-ac-dev__code">add_filter( 'webp_ac_auto_output_enabled', '__return_false' );</code>
+				<p><?php echo esc_html__( 'Disable auto output in code:', 'sasim-webp-auto-converter' ); ?></p>
+				<code class="saswac-dev__code">add_filter( 'saswac_auto_output_enabled', '__return_false' );</code>
 			</div>
 		</details>
 	</div>
@@ -390,7 +390,7 @@ function webp_auto_converter_settings_page(): void {
 }
 
 // --- Convert on upload ---
-add_filter( 'wp_generate_attachment_metadata', 'webp_auto_converter_generate_webp', 20, 2 );
+add_filter( 'wp_generate_attachment_metadata', 'saswac_generate_webp', 20, 2 );
 
 /**
  * Generate WebP siblings after WordPress creates attachment metadata.
@@ -399,15 +399,15 @@ add_filter( 'wp_generate_attachment_metadata', 'webp_auto_converter_generate_web
  * @param int   $attachment_id Attachment ID.
  * @return array
  */
-function webp_auto_converter_generate_webp( $metadata, $attachment_id ) {
+function saswac_generate_webp( $metadata, $attachment_id ) {
 	$file_path = get_attached_file( $attachment_id );
 	$mime_type = get_post_mime_type( $attachment_id );
 
-	if ( ! webp_auto_converter_is_convertible_mime( $mime_type ) ) {
+	if ( ! saswac_is_convertible_mime( $mime_type ) ) {
 		return $metadata;
 	}
 
-	webp_auto_converter_convert_file( $file_path );
+	saswac_convert_file( $file_path );
 
 	if ( ! empty( $metadata['sizes'] ) && ! empty( $metadata['file'] ) ) {
 		$upload_dir = wp_upload_dir();
@@ -416,7 +416,7 @@ function webp_auto_converter_generate_webp( $metadata, $attachment_id ) {
 			if ( empty( $size['file'] ) ) {
 				continue;
 			}
-			webp_auto_converter_convert_file( path_join( $base_dir, $size['file'] ) );
+			saswac_convert_file( path_join( $base_dir, $size['file'] ) );
 		}
 	}
 
@@ -424,7 +424,7 @@ function webp_auto_converter_generate_webp( $metadata, $attachment_id ) {
 }
 
 // --- Prefer WebP in responsive srcset when a sibling .webp exists ---
-add_filter( 'wp_calculate_image_srcset', 'webp_auto_converter_srcset_webp', 10, 5 );
+add_filter( 'wp_calculate_image_srcset', 'saswac_srcset_webp', 10, 5 );
 
 /**
  * Swap srcset URLs to WebP when a sibling file exists.
@@ -436,7 +436,7 @@ add_filter( 'wp_calculate_image_srcset', 'webp_auto_converter_srcset_webp', 10, 
  * @param int    $attachment_id Attachment ID.
  * @return array
  */
-function webp_auto_converter_srcset_webp( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
+function saswac_srcset_webp( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
 	unset( $size_array, $image_src, $image_meta, $attachment_id );
 
 	if ( empty( $sources ) || is_admin() ) {
@@ -444,8 +444,8 @@ function webp_auto_converter_srcset_webp( $sources, $size_array, $image_src, $im
 	}
 
 	foreach ( $sources as $width => $source ) {
-		$webp_url = webp_auto_converter_url_to_webp( $source['url'] );
-		if ( $webp_url && webp_auto_converter_url_file_exists( $webp_url ) ) {
+		$webp_url = saswac_url_to_webp( $source['url'] );
+		if ( $webp_url && saswac_url_file_exists( $webp_url ) ) {
 			$sources[ $width ]['url'] = $webp_url;
 		}
 	}
@@ -454,19 +454,19 @@ function webp_auto_converter_srcset_webp( $sources, $size_array, $image_src, $im
 }
 
 // --- Cleanup ---
-add_action( 'delete_attachment', 'webp_auto_converter_delete_webp_versions' );
+add_action( 'delete_attachment', 'saswac_delete_webp_versions' );
 
 /**
  * Remove WebP siblings when an attachment is deleted.
  *
  * @param int $attachment_id Attachment ID.
  */
-function webp_auto_converter_delete_webp_versions( $attachment_id ): void {
+function saswac_delete_webp_versions( $attachment_id ): void {
 	$file       = get_attached_file( $attachment_id );
 	$meta       = wp_get_attachment_metadata( $attachment_id );
 	$upload_dir = wp_upload_dir();
 
-	webp_auto_converter_unlink_webp( $file );
+	saswac_unlink_webp( $file );
 
 	if ( ! empty( $meta['sizes'] ) && ! empty( $meta['file'] ) ) {
 		$base_dir = path_join( $upload_dir['basedir'], dirname( $meta['file'] ) );
@@ -474,22 +474,22 @@ function webp_auto_converter_delete_webp_versions( $attachment_id ): void {
 			if ( empty( $size['file'] ) ) {
 				continue;
 			}
-			webp_auto_converter_unlink_webp( path_join( $base_dir, $size['file'] ) );
+			saswac_unlink_webp( path_join( $base_dir, $size['file'] ) );
 		}
 	}
 }
 
 // --- Batch AJAX ---
-add_action( 'wp_ajax_webp_auto_converter_batch', 'webp_auto_converter_ajax_batch' );
+add_action( 'wp_ajax_saswac_batch', 'saswac_ajax_batch' );
 
 /**
  * AJAX handler for batch WebP generation.
  */
-function webp_auto_converter_ajax_batch(): void {
-	check_ajax_referer( 'webp_auto_converter_batch' );
+function saswac_ajax_batch(): void {
+	check_ajax_referer( 'saswac_batch' );
 
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( array( 'message' => __( 'Forbidden', 'privaro-webp-auto-converter' ) ), 403 );
+		wp_send_json_error( array( 'message' => __( 'Forbidden', 'sasim-webp-auto-converter' ) ), 403 );
 	}
 
 	$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
@@ -499,7 +499,7 @@ function webp_auto_converter_ajax_batch(): void {
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
 			'post_mime_type' => array( 'image/jpeg', 'image/png' ),
-			'posts_per_page' => WEBP_AUTO_CONVERTER_BATCH,
+			'posts_per_page' => SASWAC_BATCH,
 			'offset'         => $offset,
 			'orderby'        => 'ID',
 			'order'          => 'ASC',
@@ -510,7 +510,7 @@ function webp_auto_converter_ajax_batch(): void {
 	$converted = 0;
 	foreach ( $query->posts as $attachment_id ) {
 		$file = get_attached_file( $attachment_id );
-		if ( $file && webp_auto_converter_convert_file( $file ) ) {
+		if ( $file && saswac_convert_file( $file ) ) {
 			++$converted;
 		}
 		$meta = wp_get_attachment_metadata( $attachment_id );
@@ -521,7 +521,7 @@ function webp_auto_converter_ajax_batch(): void {
 				if ( empty( $size['file'] ) ) {
 					continue;
 				}
-				if ( webp_auto_converter_convert_file( path_join( $base_dir, $size['file'] ) ) ) {
+				if ( saswac_convert_file( path_join( $base_dir, $size['file'] ) ) ) {
 					++$converted;
 				}
 			}
@@ -530,9 +530,9 @@ function webp_auto_converter_ajax_batch(): void {
 
 	$batch_count = count( $query->posts );
 	$processed   = $offset + $batch_count;
-	$next_offset = $offset + WEBP_AUTO_CONVERTER_BATCH;
-	$done        = $batch_count < WEBP_AUTO_CONVERTER_BATCH;
-	$total       = 0 === $offset ? webp_auto_converter_count_convertible_attachments() : null;
+	$next_offset = $offset + SASWAC_BATCH;
+	$done        = $batch_count < SASWAC_BATCH;
+	$total       = 0 === $offset ? saswac_count_convertible_attachments() : null;
 
 	$response = array(
 		'done'            => $done,
@@ -542,12 +542,12 @@ function webp_auto_converter_ajax_batch(): void {
 		'message'         => $done
 			? sprintf(
 				/* translators: %d: number of converted files in the last batch */
-				__( 'Done. Converted %d file(s) in the last batch.', 'privaro-webp-auto-converter' ),
+				__( 'Done. Converted %d file(s) in the last batch.', 'sasim-webp-auto-converter' ),
 				$converted
 			)
 			: sprintf(
 				/* translators: 1: batch offset, 2: number of converted files */
-				__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'privaro-webp-auto-converter' ),
+				__( 'Processed batch (offset %1$d). Converted %2$d file(s). Continuing…', 'sasim-webp-auto-converter' ),
 				$offset,
 				$converted
 			),
@@ -565,7 +565,7 @@ function webp_auto_converter_ajax_batch(): void {
  *
  * @param string|null $mime Mime type.
  */
-function webp_auto_converter_is_convertible_mime( ?string $mime ): bool {
+function saswac_is_convertible_mime( ?string $mime ): bool {
 	return in_array( $mime, array( 'image/jpeg', 'image/png' ), true );
 }
 
@@ -574,8 +574,8 @@ function webp_auto_converter_is_convertible_mime( ?string $mime ): bool {
  *
  * @param string $source_path Absolute path to JPEG or PNG.
  */
-function webp_auto_converter_convert_file( string $source_path ): bool {
-	if ( ! file_exists( $source_path ) || ! webp_auto_converter_gd_or_imagick_available() ) {
+function saswac_convert_file( string $source_path ): bool {
+	if ( ! file_exists( $source_path ) || ! saswac_gd_or_imagick_available() ) {
 		return false;
 	}
 
@@ -584,12 +584,12 @@ function webp_auto_converter_convert_file( string $source_path ): bool {
 		return false;
 	}
 
-	$destination = webp_auto_converter_path_to_webp( $source_path );
+	$destination = saswac_path_to_webp( $source_path );
 	if ( ! $destination ) {
 		return false;
 	}
 
-	$quality = (int) get_option( WEBP_AUTO_CONVERTER_OPTION, 82 );
+	$quality = (int) get_option( SASWAC_OPTION, 82 );
 
 	if ( class_exists( 'Imagick' ) ) {
 		try {
@@ -634,7 +634,7 @@ function webp_auto_converter_convert_file( string $source_path ): bool {
 /**
  * Whether GD or Imagick WebP support is available.
  */
-function webp_auto_converter_gd_or_imagick_available(): bool {
+function saswac_gd_or_imagick_available(): bool {
 	return ( function_exists( 'imagewebp' ) && function_exists( 'imagecreatefromjpeg' ) )
 		|| class_exists( 'Imagick' );
 }
@@ -644,7 +644,7 @@ function webp_auto_converter_gd_or_imagick_available(): bool {
  *
  * @param string $path Source path.
  */
-function webp_auto_converter_path_to_webp( string $path ): string {
+function saswac_path_to_webp( string $path ): string {
 	return (string) preg_replace( '/\.(jpe?g|png)$/i', '.webp', $path );
 }
 
@@ -653,7 +653,7 @@ function webp_auto_converter_path_to_webp( string $path ): string {
  *
  * @param string $url Source URL.
  */
-function webp_auto_converter_url_to_webp( string $url ): string {
+function saswac_url_to_webp( string $url ): string {
 	return (string) preg_replace( '/\.(jpe?g|png)(\?.*)?$/i', '.webp$2', $url );
 }
 
@@ -662,7 +662,7 @@ function webp_auto_converter_url_to_webp( string $url ): string {
  *
  * @param string $url Image URL.
  */
-function webp_auto_converter_url_file_exists( string $url ): bool {
+function saswac_url_file_exists( string $url ): bool {
 	$upload = wp_upload_dir();
 	if ( empty( $upload['basedir'] ) || empty( $upload['baseurl'] ) ) {
 		return false;
@@ -676,8 +676,8 @@ function webp_auto_converter_url_file_exists( string $url ): bool {
  *
  * @param string $source_path Source path.
  */
-function webp_auto_converter_unlink_webp( string $source_path ): void {
-	$webp = webp_auto_converter_path_to_webp( $source_path );
+function saswac_unlink_webp( string $source_path ): void {
+	$webp = saswac_path_to_webp( $source_path );
 	if ( $webp && file_exists( $webp ) ) {
 		wp_delete_file( $webp );
 	}

@@ -5,12 +5,12 @@
 #   WPORG_USER=evgenij347 WPORG_PASS='app-password' bash scripts/wporg-submit-plugin.sh [zip-path]
 #
 # Defaults:
-#   zip-path -> build/privaro-webp-auto-converter.zip
+#   zip-path -> build/sasim-webp-auto-converter.zip
 
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-ZIP_PATH="${1:-${REPO_ROOT}/build/privaro-webp-auto-converter.zip}"
+ZIP_PATH="${1:-${REPO_ROOT}/build/sasim-webp-auto-converter.zip}"
 
 if [[ -z "${WPORG_USER:-}" || -z "${WPORG_PASS:-}" ]]; then
 	echo "Set WPORG_USER and WPORG_PASS environment variables." >&2
@@ -68,7 +68,7 @@ if [[ -n "${PLUGIN_ID}" ]]; then
 		-F "_wp_http_referer=/plugins/developers/add/" \
 		-F "action=upload-additional" \
 		-F "plugin_id=${PLUGIN_ID}" \
-		-F "comment=WebP Auto Converter 1.4.0 — updated package for review." \
+		-F "comment=Sasim WebP Auto Converter 1.4.1 — renamed slug and prefixed identifiers per review." \
 		-F "zip_file=@${ZIP_PATH};type=application/zip" \
 		-o /tmp/wporg-upload-result.html
 else
